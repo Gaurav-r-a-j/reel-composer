@@ -1,4 +1,5 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useCallback} from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme-provider';
 import { FileUpload } from '@/components/screens/FileUpload';
 import { WelcomeScreen } from '@/components/screens/WelcomeScreen';
@@ -13,6 +14,9 @@ import { AppState, GeneratedContent, SRTItem } from '../types';
 import { generateReelContent } from '@/services/geminiService';
 import { APP_CONFIG } from '../config';
 import { constructPrompt, EXAMPLE_HTML, EXAMPLE_JSON, EXAMPLE_SRT, EXAMPLE_TOPIC } from '@/utils/promptTemplates';
+import { type StoredDraft } from '@/lib/draftStorage';
+import { useDraftPersistence } from '@/hooks/useDraftPersistence';
+import { useMediaObjectUrls } from '@/hooks/useMediaObjectUrls';
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(() => {
@@ -29,8 +33,7 @@ const App: React.FC = () => {
   });
 
   const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string>('');
-  const [isAudioOnly, setIsAudioOnly] = useState(false); // Track if using dummy video/audio only
+  const [isAudioOnly, setIsAudioOnly] = useState(false);
   const [srtData, setSrtData] = useState<SRTItem[]>([]);
   const [srtTextRaw, setSrtTextRaw] = useState<string>('');
   const [topicContext, setTopicContext] = useState('');
@@ -57,8 +60,8 @@ const App: React.FC = () => {
 
   // Audio State
   const [bgMusicFile, setBgMusicFile] = useState<File | null>(null);
-  const [bgMusicUrl, setBgMusicUrl] = useState<string | undefined>(undefined);
   const [bgMusicVolume, setBgMusicVolume] = useState(0.2);
+  const { videoUrl, bgMusicUrl } = useMediaObjectUrls(videoFile, bgMusicFile);
 
   // Subtitle Style State
   const [subtitleFontSize, setSubtitleFontSize] = useState(32);
@@ -68,24 +71,56 @@ const App: React.FC = () => {
   const [subtitlePaddingX, setSubtitlePaddingX] = useState(16);
   const [subtitlePaddingY, setSubtitlePaddingY] = useState(8);
 
-  // Manage Video Object URL
-  useEffect(() => {
-    if (!videoFile) return;
-    const newUrl = URL.createObjectURL(videoFile);
-    setVideoUrl(newUrl);
-    return () => URL.revokeObjectURL(newUrl);
-  }, [videoFile]);
+  const { code: draftCodeFromUrl } = useParams<{ code: string }>();
+  const navigate = useNavigate();
 
-  // Manage Audio Object URL
-  useEffect(() => {
-    if (!bgMusicFile) {
-      setBgMusicUrl(undefined);
-      return;
+  const onRestoreDraft = useCallback((draft: StoredDraft) => {
+    setGeneratedContent(draft.generatedContent);
+    setSrtTextRaw(draft.srtTextRaw);
+    setSrtData(parseSRT(draft.srtTextRaw));
+    setTopicContext(draft.topicContext);
+    setIsAudioOnly(draft.isAudioOnly);
+    setSubtitleFontSize(draft.subtitleFontSize);
+    setSubtitleFontFamily(draft.subtitleFontFamily);
+    setSubtitleColor(draft.subtitleColor);
+    setSubtitleBgColor(draft.subtitleBgColor);
+    setSubtitlePaddingX(draft.subtitlePaddingX);
+    setSubtitlePaddingY(draft.subtitlePaddingY);
+    if (draft.videoBlob) {
+      setVideoFile(new File([draft.videoBlob], 'restored-video.mp4', { type: draft.videoBlob.type }));
+    } else {
+      setVideoFile(null);
     }
-    const newUrl = URL.createObjectURL(bgMusicFile);
-    setBgMusicUrl(newUrl);
-    return () => URL.revokeObjectURL(newUrl);
-  }, [bgMusicFile]);
+    if (draft.audioBlob) {
+      setBgMusicFile(new File([draft.audioBlob], 'restored-bg-music', { type: draft.audioBlob.type }));
+    } else {
+      setBgMusicFile(null);
+    }
+  }, []);
+
+  const {
+    isRestoringDraft,
+    clearDraftsAndNavigate,
+    resetDraftAndNavigate,
+  } = useDraftPersistence({
+    draftCodeFromUrl,
+    navigate,
+    appState,
+    generatedContent,
+    srtTextRaw,
+    topicContext,
+    isAudioOnly,
+    subtitleFontSize,
+    subtitleFontFamily,
+    subtitleColor,
+    subtitleBgColor,
+    subtitlePaddingX,
+    subtitlePaddingY,
+    videoFile,
+    bgMusicFile,
+    onRestore: onRestoreDraft,
+    setAppState,
+  });
 
   const saveApiKeyToStorage = () => {
     if (apiKey) {
@@ -123,15 +158,11 @@ const App: React.FC = () => {
   };
 
   const handleResetAuth = () => {
-    // Return to welcome screen.
-    // NOTE: We do NOT clear the API Key from localStorage or state here.
-    // This allows the Welcome Screen to pre-populate the existing key for editing.
     setAppState(AppState.WELCOME);
-
-    // Reset file states
     setGeneratedContent(null);
     setVideoFile(null);
     setSrtData([]);
+    resetDraftAndNavigate();
   };
 
   const handleFilesSelected = async (video: File, srt: File, isAudioMode: boolean) => {
@@ -294,8 +325,10 @@ const App: React.FC = () => {
   };
 
   const handleNewProject = () => {
+    clearDraftsAndNavigate();
     setAppState(AppState.UPLOAD);
     setGeneratedContent(null);
+    setVideoFile(null);
     setBgMusicFile(null);
     setPendingContent(null);
     setShowReplaceDialog(false);
@@ -308,7 +341,11 @@ const App: React.FC = () => {
 
       {/* Main App Container - Only rendered on Desktop (md+) */}
       <div className="hidden md:block md:min-h-screen md:h-full md:w-full">
-        {appState === AppState.WELCOME ? (
+        {isRestoringDraft ? (
+          <div className="h-screen w-full flex items-center justify-center bg-background">
+            <p className="text-muted-foreground">Loading draft…</p>
+          </div>
+        ) : appState === AppState.WELCOME ? (
           <div className="h-screen w-full overflow-y-auto overflow-x-hidden bg-background">
             <WelcomeScreen onComplete={handleWelcomeComplete}/>
           </div>

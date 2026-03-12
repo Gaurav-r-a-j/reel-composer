@@ -8,6 +8,7 @@ import {
   generateDraftCode,
   type StoredDraft,
 } from '@/lib/draftStorage';
+import { draftUrl } from '@/routes';
 
 export interface UseDraftPersistenceArgs {
   draftCodeFromUrl: string | undefined;
@@ -105,7 +106,7 @@ export function useDraftPersistence(args: UseDraftPersistenceArgs) {
       );
       setCurrentDraftCodeState(newCode);
       setCurrentDraftCode(newCode);
-      navigate(`/draft/${newCode}`, { replace: true });
+      navigate(draftUrl(newCode), { replace: true });
     },
     [
       generatedContent,

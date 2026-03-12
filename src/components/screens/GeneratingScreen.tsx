@@ -32,14 +32,14 @@ export const GeneratingScreen: React.FC<GeneratingScreenProps> = ({
   srtDataLength
 }) => {
   return (
-    <div className="flex flex-col h-full overflow-auto bg-page">
+    <div className="flex flex-col h-full overflow-auto bg-background">
       <div className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto p-6 space-y-6 animate-fade-in">
         <div className="text-center space-y-2">
-          <div className="mx-auto w-14 h-14 bg-accent-muted rounded-2xl flex items-center justify-center text-accent mb-3">
+          <div className="mx-auto w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-3">
             <LayoutTemplate size={28} />
           </div>
-          <h2 className="text-2xl font-bold text-ink">Director's Studio</h2>
-          <p className="text-ink-muted text-sm max-w-md mx-auto leading-relaxed">
+          <h2 className="text-2xl font-bold text-foreground">Director's Studio</h2>
+          <p className="text-muted-foreground text-sm max-w-md mx-auto leading-relaxed">
             {isAudioOnly
               ? "Audio-Only Mode: We will generate full-screen visuals to accompany your script."
               : "Describe your video topic. We'll copy this prompt to your clipboard and auto-generate the initial animation scene."}
@@ -76,7 +76,7 @@ export const GeneratingScreen: React.FC<GeneratingScreenProps> = ({
 
           {isGenerating && showManualButton && (
             <div className="animate-fade-in text-center pt-1">
-              <span className="text-xs text-ink-subtle block mb-2">Taking longer than expected?</span>
+              <span className="text-xs text-muted-foreground block mb-2">Taking longer than expected?</span>
               <Button variant="link" size="sm" onClick={onManualModeEnter} className="h-auto p-0">
                 Skip & Enter Manual Mode
               </Button>
@@ -85,12 +85,12 @@ export const GeneratingScreen: React.FC<GeneratingScreenProps> = ({
         </div>
 
         {error && (
-          <div className="w-full p-4 bg-danger-muted border border-danger/30 rounded-xl flex flex-col gap-3 animate-fade-in">
+          <div className="w-full p-4 bg-destructive/10 border border-destructive/30 rounded-xl flex flex-col gap-3 animate-fade-in">
             <div className="flex items-start gap-3">
-              <AlertCircle size={20} className="text-danger shrink-0 mt-0.5" />
+              <AlertCircle size={20} className="text-destructive shrink-0 mt-0.5" />
               <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-semibold text-danger">Generation Failed</h4>
-                <p className="text-xs text-danger/90 mt-1 leading-relaxed">{error}</p>
+                <h4 className="text-sm font-semibold text-destructive">Generation Failed</h4>
+                <p className="text-xs text-destructive/90 mt-1 leading-relaxed">{error}</p>
               </div>
             </div>
             <div className="flex gap-3 pl-8 flex-wrap">

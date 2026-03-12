@@ -231,7 +231,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
     const hasSource = activeTab === 'video' ? !!videoFile : (!!audioFile || !!generatedAudioFile);
 
     return (
-        <div className={`border-2 border-dashed rounded-xl transition-all h-64 relative overflow-hidden flex flex-col ${currentSrt ? 'border-success bg-success-muted' : 'border-edge bg-surface-elevated'}`}>
+        <div className={`border-2 border-dashed rounded-xl transition-all h-64 relative overflow-hidden flex flex-col ${currentSrt ? 'border-primary bg-primary/10' : 'border-border bg-muted'}`}>
             {!isEditingSrt ? (
                 <>
                     <input 
@@ -255,11 +255,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                         >
                             <X size={14} />
                         </Button>
-                        <div className="p-3 rounded-full bg-success text-white mb-2 shadow">
+                        <div className="p-3 rounded-full bg-primary text-primary-foreground mb-2 shadow">
                             <CheckSquare size={24} />
                         </div>
-                        <p className="font-semibold text-ink text-sm max-w-[80%] truncate mb-1">{currentSrt.name}</p>
-                        <p className="text-xs text-success font-mono mb-4">{(currentSrt.size / 1024).toFixed(1)} KB</p>
+                        <p className="font-semibold text-foreground text-sm max-w-[80%] truncate mb-1">{currentSrt.name}</p>
+                        <p className="text-xs text-primary font-mono mb-4">{(currentSrt.size / 1024).toFixed(1)} KB</p>
                         <div className="flex gap-2 z-10">
                             <Button type="button" variant="outline" size="sm" onClick={() => setIsEditingSrt(true)}>
                                 <Edit2 size={12} /> Edit
@@ -271,7 +271,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                     </div>
                     ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center p-6 space-y-4">
-                            <p className="text-ink-muted text-sm">Add Captions</p>
+                            <p className="text-muted-foreground text-sm">Add Captions</p>
                             <div className="grid grid-cols-1 gap-2 w-full max-w-xs">
                                 <div className="flex gap-2 w-full">
                                     <Button
@@ -314,9 +314,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                     )}
                 </>
             ) : (
-                    <div className="flex flex-col h-full w-full bg-page">
-                    <div className="flex items-center justify-between px-4 py-2 border-b border-edge bg-surface-elevated">
-                        <span className="text-xs font-semibold text-ink-muted">Editing Subtitles</span>
+                    <div className="flex flex-col h-full w-full bg-background">
+                    <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted">
+                        <span className="text-xs font-semibold text-muted-foreground">Editing Subtitles</span>
                         <Button type="button" variant="ghost" size="icon-xs" onClick={() => setIsEditingSrt(false)}><X size={14} /></Button>
                     </div>
                     <Textarea
@@ -335,19 +335,19 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
   };
 
   return (
-    <div className="flex flex-col h-full w-full animate-fade-in relative bg-page">
+    <div className="flex flex-col h-full w-full animate-fade-in relative bg-background">
       <div className="flex-1 flex flex-col items-center justify-center p-6 w-full overflow-y-auto">
           <div className="w-full max-w-5xl space-y-6 my-auto">
             <div className="text-center space-y-2 mb-6">
-                <h1 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-accent to-accent-secondary tracking-tight leading-tight">
+                <h1 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary tracking-tight leading-tight">
                   Reel Composer
                 </h1>
-                <p className="text-ink-muted text-base md:text-lg">
+                <p className="text-muted-foreground text-base md:text-lg">
                   Create viral shorts from any media source.
                 </p>
             </div>
 
-            <div className="flex border-b border-edge w-full max-w-md mx-auto mb-2">
+            <div className="flex border-b border-border w-full max-w-md mx-auto mb-2">
                 <Button
                     type="button"
                     variant="ghost"
@@ -370,15 +370,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                 </Button>
             </div>
 
-            <div className="w-full bg-surface/60 border border-edge rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-lg">
+            <div className="w-full bg-card/60 border border-border rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-lg">
                 {activeTab === 'video' ? (
                 // --- VIDEO UPLOAD MODE ---
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
                     <div className="space-y-3">
-                    <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wider flex items-center gap-2">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                         <Clapperboard size={14} /> Source Footage
                     </h3>
-                    <div className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center transition-all h-64 relative overflow-hidden group ${videoFile ? 'border-accent bg-accent-muted' : 'border-edge hover:border-accent/50 bg-surface-elevated'}`}>
+                    <div className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center transition-all h-64 relative overflow-hidden group ${videoFile ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50 bg-muted'}`}>
                         <input type="file" accept="video/*" onChange={handleVideoChange} className="hidden" id="video-upload" />
                         
                         {videoFile ? (
@@ -394,12 +394,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                     <X size={16} />
                                 </Button>
 
-                                <div className="p-4 rounded-full bg-accent text-white mb-4">
+                                <div className="p-4 rounded-full bg-primary text-primary-foreground mb-4">
                                     <FileVideo size={32} />
                                 </div>
                                 <div className="text-center px-4">
-                                    <p className="font-semibold text-base text-ink truncate max-w-[200px]">{videoFile.name}</p>
-                                    <p className="text-xs text-ink-subtle mt-1">{(videoFile.size / (1024*1024)).toFixed(1)} MB</p>
+                                    <p className="font-semibold text-base text-foreground truncate max-w-[200px]">{videoFile.name}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{(videoFile.size / (1024*1024)).toFixed(1)} MB</p>
                                 </div>
 
                                 <Button type="button" variant="outline" size="sm" onClick={handleExtractAudio} disabled={isExtracting} className="absolute bottom-4 right-4 z-20">
@@ -408,12 +408,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                             </div>
                         ) : (
                             <label htmlFor="video-upload" className="cursor-pointer flex flex-col items-center space-y-4 w-full h-full justify-center z-10">
-                                <div className="p-4 rounded-full bg-surface-elevated text-accent group-hover:scale-105 transition-transform duration-200">
+                                <div className="p-4 rounded-full bg-muted text-primary group-hover:scale-105 transition-transform duration-200">
                                     <FileVideo size={32} />
                                 </div>
                                 <div className="text-center">
-                                    <p className="font-semibold text-base text-ink">Select Video</p>
-                                    <p className="text-xs text-ink-subtle mt-1">MP4, MOV, WEBM</p>
+                                    <p className="font-semibold text-base text-foreground">Select Video</p>
+                                    <p className="text-xs text-muted-foreground mt-1">MP4, MOV, WEBM</p>
                                 </div>
                             </label>
                         )}
@@ -421,7 +421,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                     </div>
 
                     <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                         <FileText size={14}/> Subtitles
                     </h3>
                     {renderSRTSection()}
@@ -431,7 +431,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                 // --- AUDIO / TTS MODE ---
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
                     <div className="space-y-4">
-                        <div className="flex p-1 rounded-lg w-fit border border-edge bg-muted/30">
+                        <div className="flex p-1 rounded-lg w-fit border border-border bg-muted/30">
                             <Button type="button" variant={audioSourceType === 'upload' ? 'secondary' : 'ghost'} size="sm" onClick={() => setAudioSourceType('upload')}>
                                 Upload File
                             </Button>
@@ -441,7 +441,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                         </div>
 
                         {audioSourceType === 'upload' ? (
-                            <div className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center transition-all h-60 relative ${audioFile ? 'border-accent-secondary bg-accent-muted' : 'border-edge hover:border-accent-secondary/50 bg-surface-elevated'}`}>
+                            <div className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center transition-all h-60 relative ${audioFile ? 'border-secondary bg-secondary/10' : 'border-border hover:border-secondary/50 bg-muted'}`}>
                                 <input type="file" accept="audio/*,.wav,.mp3,.m4a" onChange={handleAudioFileChange} className="hidden" id="audio-upload" />
                                 
                                 {audioFile ? (
@@ -456,23 +456,23 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                             <X size={14} />
                                         </Button>
                                         <label htmlFor="audio-upload" className="cursor-pointer flex flex-col items-center space-y-3 w-full h-full justify-center z-10">
-                                            <div className="p-4 rounded-full bg-accent-secondary text-white">
+                                            <div className="p-4 rounded-full bg-secondary text-secondary-foreground">
                                                 <Music size={28} />
                                             </div>
                                             <div className="text-center">
-                                                <p className="font-semibold text-ink truncate max-w-[200px]">{audioFile.name}</p>
-                                                <p className="text-xs text-ink-subtle mt-1">{(audioFile.size / (1024*1024)).toFixed(1)} MB</p>
+                                                <p className="font-semibold text-foreground truncate max-w-[200px]">{audioFile.name}</p>
+                                                <p className="text-xs text-muted-foreground mt-1">{(audioFile.size / (1024*1024)).toFixed(1)} MB</p>
                                             </div>
                                         </label>
                                     </>
                                 ) : (
                                     <label htmlFor="audio-upload" className="cursor-pointer flex flex-col items-center space-y-3 w-full h-full justify-center">
-                                        <div className="p-4 rounded-full bg-surface-elevated text-ink-muted">
+                                        <div className="p-4 rounded-full bg-muted text-muted-foreground">
                                             <Music size={28} />
                                         </div>
                                         <div className="text-center">
-                                            <p className="font-semibold text-ink">Drop Audio File</p>
-                                            <p className="text-xs text-ink-subtle mt-1">WAV, MP3, M4A</p>
+                                            <p className="font-semibold text-foreground">Drop Audio File</p>
+                                            <p className="text-xs text-muted-foreground mt-1">WAV, MP3, M4A</p>
                                         </div>
                                     </label>
                                 )}
@@ -501,12 +501,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
 
                         {/* Generated Audio Preview */}
                         {(generatedAudioFile || audioFile) && (
-                            <div className="bg-gray-800/50 rounded-xl p-3 border border-gray-700 flex items-center gap-3 animate-fade-in relative group">
-                                <div className="p-2 bg-pink-500/20 rounded-full text-pink-400">
+                            <div className="bg-muted/50 rounded-xl p-3 border border-border flex items-center gap-3 animate-fade-in relative group">
+                                <div className="p-2 bg-primary/20 rounded-full text-primary">
                                     <Music size={16}/>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-bold text-white truncate">{(generatedAudioFile || audioFile)?.name}</p>
+                                    <p className="text-xs font-bold text-foreground truncate">{(generatedAudioFile || audioFile)?.name}</p>
                                     <audio controls src={URL.createObjectURL(generatedAudioFile || audioFile!)} className="w-full h-6 mt-1 opacity-70 hover:opacity-100" />
                                 </div>
                                 <Button variant="ghost" size="icon-sm" onClick={handleDownloadAudio} title="Download Audio">
@@ -519,7 +519,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                     </div>
 
                     <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                         <FileText size={14}/> Subtitles
                     </h3>
                     {renderSRTSection()}
@@ -554,11 +554,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                 </div>
             </div>
 
-            <div className="flex justify-center gap-6 text-xs text-gray-500 mt-4 pb-4">
-                <a href="https://transcri.io/en/subtitle-generator/srt" target="_blank" rel="noreferrer" className="hover:text-purple-400 transition-colors flex items-center gap-1">
+            <div className="flex justify-center gap-6 text-xs text-muted-foreground mt-4 pb-4">
+                <a href="https://transcri.io/en/subtitle-generator/srt" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors flex items-center gap-1">
                     <ExternalLink size={10} /> Transcri.io
                 </a>
-                <a href="https://podcast.adobe.com/enhance" target="_blank" rel="noreferrer" className="hover:text-purple-400 transition-colors flex items-center gap-1">
+                <a href="https://podcast.adobe.com/enhance" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors flex items-center gap-1">
                     <Music size={10} /> Adobe Enhance
                 </a>
             </div>
@@ -566,19 +566,19 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
       </div>
 
       {/* Footer - Fixed Bottom */}
-      <div className="border-t border-gray-800 bg-gray-950 p-8 w-full shrink-0 z-20">
+      <div className="border-t border-border bg-muted p-8 w-full shrink-0 z-20">
             <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-6">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 p-[2px]">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary p-[2px]">
                   <a href="https://prasannathapa.in" target="_blank">
-                  <img src="https://blog.prasannathapa.in/content/images/2024/12/Picsart_24-12-18_08-13-50-070.jpg" alt="Prasanna Thapa" className="rounded-full w-full h-full object-cover bg-black" />
+                  <img src="https://blog.prasannathapa.in/content/images/2024/12/Picsart_24-12-18_08-13-50-070.jpg" alt="Prasanna Thapa" className="rounded-full w-full h-full object-cover bg-background" />
                   </a>
                 </div>
                 <div>
-                  <div className="font-bold text-white text-base text-xl">Prasanna Thapa</div>
-                  <div className="text-s text-gray-400 flex items-center gap-1.5">
+                  <div className="font-bold text-foreground text-base text-xl">Prasanna Thapa</div>
+                  <div className="text-s text-muted-foreground flex items-center gap-1.5">
                     Technical Architect
-                    <div className="hidden md:block w-px h-4 bg-gray-700/50"></div>
+                    <div className="hidden md:block w-px h-4 bg-border"></div>
                     <a href="https://zoho.com" target="_blank">
                     <img src="https://www.zohowebstatic.com/sites/default/files/zoho_general_pages/zoho-logo-white.png" alt="Zoho" className="h-5" />
                     </a>
@@ -587,23 +587,23 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
               </div>
               
               <div className="flex flex-wrap justify-center gap-4 items-center">
-                <a href="https://blog.prasannathapa.in/reel-composer/" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-900/20 text-purple-400 hover:bg-purple-900/40 hover:text-white transition-colors text-sm font-medium border border-purple-500/30">
+                <a href="https://blog.prasannathapa.in/reel-composer/" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary hover:bg-primary/40 hover:text-primary-foreground transition-colors text-sm font-medium border border-primary/30">
                   <BookOpen size={14} /> The Philosophy
                 </a>
-                <a href="https://github.com/prasannathapa/reel-composer" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors text-sm font-medium border border-gray-700">
+                <a href="https://github.com/prasannathapa/reel-composer" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors text-sm font-medium border border-border">
                   <Github size={14} /> Source Code
                 </a>
-                <div className="hidden md:block w-px h-4 bg-gray-700/50"></div>
-                <a href="https://prasannathapa.in/" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-purple-400 transition-colors" title="Website">
+                <div className="hidden md:block w-px h-4 bg-border"></div>
+                <a href="https://prasannathapa.in/" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary transition-colors" title="Website">
                 <Globe size={20} />
                 </a>
-                <a href="https://github.com/prasannathapa" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white transition-colors" title="GitHub">
+                <a href="https://github.com/prasannathapa" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground transition-colors" title="GitHub">
                 <Github size={20} />
                 </a>
-                <a href="https://www.linkedin.com/in/prasannathapa" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors" title="LinkedIn">
+                <a href="https://www.linkedin.com/in/prasannathapa" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary transition-colors" title="LinkedIn">
                 <Linkedin size={20} />
                 </a>
-                <a href="https://instagram.com/prasanna_thapa" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-pink-400 transition-colors" title="Instagram">
+                <a href="https://instagram.com/prasanna_thapa" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary transition-colors" title="Instagram">
                 <Instagram size={20} />
                 </a>
               </div>

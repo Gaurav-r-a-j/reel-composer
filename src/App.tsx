@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
+import { ThemeProvider } from '@/components/theme-provider';
 import { FileUpload } from '@/components/screens/FileUpload';
 import { WelcomeScreen } from '@/components/screens/WelcomeScreen';
 import { MobileBlocker } from '@/components/layout/MobileBlocker';
@@ -302,7 +303,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <MobileBlocker/>
 
       {/* Main App Container - Only rendered on Desktop (md+) */}
@@ -310,7 +311,7 @@ const App: React.FC = () => {
         {appState === AppState.WELCOME ? (
           <WelcomeScreen onComplete={handleWelcomeComplete}/>
         ) : (
-          <div className="w-full h-screen flex flex-col bg-page text-ink overflow-hidden relative">
+          <div className="w-full h-screen flex flex-col bg-background text-foreground overflow-hidden relative">
             {/* Header */}
             {!isFullScreen && appState !== AppState.UPLOAD && (
               <AppHeader
@@ -407,7 +408,7 @@ const App: React.FC = () => {
           </div>
         )}
       </div>
-    </>
+    </ThemeProvider>
   );
 };
 

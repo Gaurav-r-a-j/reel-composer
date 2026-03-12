@@ -307,9 +307,11 @@ const App: React.FC = () => {
       <MobileBlocker/>
 
       {/* Main App Container - Only rendered on Desktop (md+) */}
-      <div className="hidden md:contents">
+      <div className="hidden md:block md:min-h-screen md:h-full md:w-full">
         {appState === AppState.WELCOME ? (
-          <WelcomeScreen onComplete={handleWelcomeComplete}/>
+          <div className="h-screen w-full overflow-y-auto overflow-x-hidden bg-background">
+            <WelcomeScreen onComplete={handleWelcomeComplete}/>
+          </div>
         ) : (
           <div className="w-full h-screen flex flex-col bg-background text-foreground overflow-hidden relative">
             {/* Header */}

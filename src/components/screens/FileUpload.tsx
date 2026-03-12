@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, FileVideo, FileText, ArrowRight, Download, ExternalLink, Music, Wand2, Mic, Play, FileAudio, Disc, Video, Clapperboard, Sparkles, CheckSquare, Edit2, Save, X, Headphones, Trash2, ArrowLeft } from 'lucide-react';
+import { Upload, FileVideo, FileText, ArrowRight, Download, ExternalLink, Music, Wand2, Play, Clapperboard, Sparkles, CheckSquare, Edit2, Save, X, Trash2, ArrowLeft } from 'lucide-react';
 import { extractWavFromVideo } from '@/utils/audioHelpers';
 import { generateSRT, generateTTS } from '@/services/geminiService';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
 import { ModeToggle } from '@/components/layout/ModeToggle';
 import { AppFooter } from '@/components/layout/AppFooter';
 
@@ -233,7 +234,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
     const hasSource = activeTab === 'video' ? !!videoFile : (!!audioFile || !!generatedAudioFile);
 
     return (
-        <div className={`border-2 border-dashed rounded-xl transition-all h-64 relative overflow-hidden flex flex-col ${currentSrt ? 'border-primary bg-primary/10' : 'border-border bg-muted'}`}>
+        <div className={`border-2 border-dashed rounded-xl transition-all min-h-[240px] relative overflow-hidden flex flex-col ${currentSrt ? 'border-primary bg-primary/5' : 'border-border bg-muted/50'}`}>
             {!isEditingSrt ? (
                 <>
                     <input 
@@ -274,18 +275,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                     ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center p-6 space-y-4">
                             <p className="text-muted-foreground text-sm">Add Captions</p>
-                            <div className="grid grid-cols-1 gap-2 w-full max-w-xs">
+                                <div className="grid grid-cols-1 gap-2 w-full max-w-xs">
                                 <div className="flex gap-2 w-full">
                                     <Button
                                         type="button"
-                                        variant="default"
+                                        variant="gradient"
                                         size="sm"
                                         onClick={handleAutoGenerateSRT}
                                         disabled={!hasSource || isAutoGeneratingSRT}
-                                        className="flex-1"
+                                        className="flex-1 rounded-lg gap-2"
                                     >
-                                        {isAutoGeneratingSRT ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <Wand2 size={16} />}
-                                        {isAutoGeneratingSRT ? "Generating..." : "Auto-Generate (AI)"}
+                                        {isAutoGeneratingSRT ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Wand2 size={16} />}
+                                        {isAutoGeneratingSRT ? "Generating…" : "Auto-Generate (AI)"}
                                     </Button>
                                     {isAutoGeneratingSRT && (
                                         <Button
@@ -305,7 +306,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                         variant="outline"
                                         size="sm"
                                         disabled={isAutoGeneratingSRT}
-                                        className="w-full"
+                                        className="w-full rounded-lg gap-2"
                                         onClick={() => document.getElementById('srt-upload')?.click()}
                                     >
                                         <Upload size={16} /> Upload .SRT
@@ -338,52 +339,60 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
 
   return (
     <div className="flex flex-col h-full w-full animate-fade-in relative bg-background">
-      <div className="absolute top-4 right-4 z-100">
-        <ModeToggle />
-      </div>
+      <header className="shrink-0 border-b border-border bg-background/95 backdrop-blur-sm z-10">
+        <div className="container flex items-center justify-between h-14">
+          <div className="flex items-center gap-2">
+            <div className="size-8 rounded-lg bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] flex items-center justify-center">
+              <Play className="size-4 text-white" />
+            </div>
+            <span className="font-semibold text-foreground">Reel Composer</span>
+          </div>
+          <ModeToggle />
+        </div>
+      </header>
       <div className="flex-1 flex flex-col w-full overflow-y-auto">
-          <div className="container space-y-6 my-auto py-6">
-            <section className="text-center space-y-2 pb-4" aria-label="Title">
-              <h1 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary tracking-tight leading-tight text-foreground">
-                Reel Composer
+          <div className="container max-w-4xl mx-auto space-y-8 py-8 px-4">
+            <section className="text-center space-y-2" aria-label="Title">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+                <span className="bg-[linear-gradient(90deg,#8B5CF6,#3B82F6)] bg-clip-text text-transparent">
+                  Create viral shorts
+                </span>
               </h1>
               <p className="text-muted-foreground text-base md:text-lg">
-                Create viral shorts from any media source.
+                Upload your source and captions, then enter the studio.
               </p>
             </section>
 
-            <div className="flex w-full max-w-md mx-auto rounded-full bg-muted/40 p-1 shadow-sm">
+            <div className="flex w-full max-w-sm mx-auto rounded-xl border border-border bg-muted/30 p-1">
                 <Button
                     type="button"
-                    variant="ghost"
+                    variant={activeTab === 'video' ? 'secondary' : 'ghost'}
                     size="sm"
                     onClick={() => setActiveTab('video')}
-                    className="flex-1 relative rounded-t-lg gap-2 py-2.5"
+                    className="flex-1 rounded-lg gap-2 py-2.5 font-medium"
                 >
-                    Video Studio
-                    {activeTab === 'video' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />}
+                    <Clapperboard className="size-4" /> Video Studio
                 </Button>
                 <Button
                     type="button"
-                    variant="ghost"
+                    variant={activeTab === 'audio' ? 'secondary' : 'ghost'}
                     size="sm"
                     onClick={() => setActiveTab('audio')}
-                    className="flex-1 relative rounded-t-lg gap-2 py-2.5"
+                    className="flex-1 rounded-lg gap-2 py-2.5 font-medium"
                 >
-                    Audio Visualizer
-                    {activeTab === 'audio' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />}
+                    <Music className="size-4" /> Audio Visualizer
                 </Button>
             </div>
 
-            <div className="w-full bg-card rounded-2xl overflow-hidden shadow-sm">
+            <Card className="w-full overflow-hidden rounded-2xl border-border shadow-sm">
+              <CardContent className="p-0">
                 {activeTab === 'video' ? (
-                // --- VIDEO UPLOAD MODE ---
-                <div className="grid grid-cols-1 md:grid-cols-2">
-                    <section className="p-6 md:p-6 space-y-3" aria-labelledby="source-heading">
-                    <h3 id="source-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
-                        <Clapperboard size={14} /> Source Footage
-                    </h3>
-                    <div className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center transition-all h-64 relative overflow-hidden group ${videoFile ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50 bg-muted'}`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border">
+                    <section className="p-6 space-y-4" aria-labelledby="source-heading">
+                    <h2 id="source-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+                        <Clapperboard className="size-4 text-primary" /> Source footage
+                    </h2>
+                    <div className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center transition-all min-h-[240px] relative overflow-hidden group ${videoFile ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40 bg-muted/50'}`}>
                         <input type="file" accept="video/*" onChange={handleVideoChange} className="hidden" id="video-upload" />
                         
                         {videoFile ? (
@@ -425,20 +434,20 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                     </div>
                     </section>
 
-                    <section className="p-6 md:p-6 space-y-3 border-t border-border md:border-t-0 md:border-l" aria-labelledby="subtitles-heading">
-                    <h3 id="subtitles-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
-                        <FileText size={14}/> Subtitles
-                    </h3>
+                    <section className="p-6 space-y-4" aria-labelledby="subtitles-heading">
+                    <h2 id="subtitles-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+                        <FileText className="size-4 text-primary" /> Subtitles
+                    </h2>
                     {renderSRTSection()}
                     </section>
                 </div>
                 ) : (
                 // --- AUDIO / TTS MODE ---
-                <div className="grid grid-cols-1 md:grid-cols-2">
-                    <section className="p-6 md:p-6 space-y-4" aria-labelledby="audio-source-heading">
-                        <h3 id="audio-source-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
-                            <Music size={14} /> Audio Source
-                        </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border">
+                    <section className="p-6 space-y-4" aria-labelledby="audio-source-heading">
+                        <h2 id="audio-source-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+                            <Music className="size-4 text-primary" /> Audio source
+                        </h2>
                         <div className="flex p-1 rounded-lg w-fit border border-border bg-muted/30">
                             <Button type="button" variant={audioSourceType === 'upload' ? 'secondary' : 'ghost'} size="sm" onClick={() => setAudioSourceType('upload')}>
                                 Upload File
@@ -501,8 +510,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                     placeholder="Type script here..."
                                     className="flex-1 min-h-0 w-full resize-none"
                                 />
-                                <Button onClick={handleGenerateTTS} disabled={isGeneratingAudio || !ttsScript || !apiKey} className="w-full">
-                                    {isGeneratingAudio ? "Synthesizing..." : "Generate Audio (AI)"}
+                                <Button variant="gradient" onClick={handleGenerateTTS} disabled={isGeneratingAudio || !ttsScript || !apiKey} className="w-full rounded-lg">
+                                    {isGeneratingAudio ? "Synthesizing…" : "Generate Audio (AI)"}
                                 </Button>
                             </div>
                         )}
@@ -526,50 +535,50 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                         )}
                     </section>
 
-                    <section className="p-6 md:p-6 space-y-3 border-t border-border md:border-t-0 md:border-l" aria-labelledby="audio-subtitles-heading">
-                    <h3 id="audio-subtitles-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
-                        <FileText size={14}/> Subtitles
-                    </h3>
+                    <section className="p-6 space-y-4" aria-labelledby="audio-subtitles-heading">
+                    <h2 id="audio-subtitles-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+                        <FileText className="size-4 text-primary" /> Subtitles
+                    </h2>
                     {renderSRTSection()}
                     </section>
                 </div>
                 )}
-            </div>
+              </CardContent>
+            </Card>
 
-            <div className="flex justify-center w-full">
-                <div className="flex items-center gap-4 w-full max-w-md mx-auto">
-                    {/* BACK BUTTON */}
+            <div className="flex flex-col items-center gap-6 pt-4">
+                <div className="flex items-center gap-4 w-full max-w-md">
                     <Button
                         type="button"
                         variant="outline"
-                        size="icon-lg"
+                        size="lg"
                         onClick={onBack}
-                        className="w-16 h-16 rounded-full"
+                        className="shrink-0 rounded-xl h-12 px-5 gap-2"
                         title="Change API Key / Back"
                     >
-                        <ArrowLeft size={24} />
+                        <ArrowLeft className="size-5" /> Back
                     </Button>
-
-                    {/* ENTER STUDIO BUTTON */}
                     <Button
+                        variant="gradient"
                         onClick={handleNext}
                         disabled={activeTab === 'video' ? (!videoFile || !currentSrt) : (!(generatedAudioFile || audioFile) || !currentSrt)}
-                        className="flex-1 h-16 rounded-full gap-3 text-lg font-black"
+                        className="flex-1 h-12 rounded-xl gap-2 text-base font-semibold"
                         size="lg"
                     >
                         {activeTab === 'video' ? 'Enter Studio' : 'Compose Visualizer'}
-                        <ArrowRight size={24} className="shrink-0" />
+                        <ArrowRight className="size-5 shrink-0" />
                     </Button>
                 </div>
-            </div>
-
-            <div className="flex justify-center gap-6 text-xs text-muted-foreground mt-4 pb-4">
-                <a href="https://transcri.io/en/subtitle-generator/srt" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <ExternalLink size={10} /> Transcri.io
-                </a>
-                <a href="https://podcast.adobe.com/enhance" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <Music size={10} /> Adobe Enhance
-                </a>
+                <p className="text-xs text-muted-foreground">
+                    Need captions?{' '}
+                    <a href="https://transcri.io/en/subtitle-generator/srt" target="_blank" rel="noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
+                        <ExternalLink className="size-3" /> Transcri.io
+                    </a>
+                    {' · '}
+                    <a href="https://podcast.adobe.com/enhance" target="_blank" rel="noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
+                        <Music className="size-3" /> Adobe Enhance
+                    </a>
+                </p>
             </div>
           </div>
       </div>

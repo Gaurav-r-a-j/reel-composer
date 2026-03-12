@@ -1,5 +1,8 @@
 import React from 'react';
 import { LayoutTemplate, AlertCircle, Edit3 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface GeneratingScreenProps {
   isAudioOnly: boolean;
@@ -44,28 +47,20 @@ export const GeneratingScreen: React.FC<GeneratingScreenProps> = ({
         </div>
 
         <div className="w-full space-y-3">
-          <label htmlFor="topic-context" className="block text-xs font-medium text-ink-muted uppercase tracking-wider">
-            Video Topic / Visual Context <span className="text-ink-subtle normal-case">(Optional)</span>
-          </label>
-          <textarea
+          <Label htmlFor="topic-context">
+            Video Topic / Visual Context <span className="normal-case">(Optional)</span>
+          </Label>
+          <Textarea
             id="topic-context"
             value={topicContext}
             onChange={(e) => onTopicContextChange(e.target.value)}
             placeholder={isAudioOnly ? "e.g. Visuals should be about space exploration, with planets and stars." : "e.g. This video explains Quantum Tunneling. I want particles passing through barriers..."}
-            className="w-full h-28 bg-surface border border-edge rounded-xl p-4 text-ink placeholder-ink-subtle focus:border-accent focus:ring-2 focus:ring-accent/25 outline-none resize-none transition-all focus-ring"
+            className="w-full min-h-28 resize-none"
           />
         </div>
 
         <div className="w-full space-y-3">
-          <button
-            onClick={onEnterStudio}
-            disabled={isGenerating}
-            className={`w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all focus-ring ${
-              isGenerating
-                ? 'bg-surface-elevated text-ink-subtle cursor-not-allowed'
-                : 'bg-gradient-to-r from-accent to-accent-secondary hover:opacity-95 text-white shadow-lg hover:scale-[1.01] active:scale-[0.99]'
-            }`}
-          >
+          <Button onClick={onEnterStudio} disabled={isGenerating} className="w-full h-auto py-3.5 gap-2">
             {isGenerating ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -77,17 +72,14 @@ export const GeneratingScreen: React.FC<GeneratingScreenProps> = ({
                 {!apiKey ? "No API Key - Enter Manual Mode" : (srtDataLength === 0 ? "Enter Demo Studio" : "Enter Studio & Auto-Generate")}
               </>
             )}
-          </button>
+          </Button>
 
           {isGenerating && showManualButton && (
             <div className="animate-fade-in text-center pt-1">
               <span className="text-xs text-ink-subtle block mb-2">Taking longer than expected?</span>
-              <button
-                onClick={onManualModeEnter}
-                className="text-sm text-accent hover:text-ink underline underline-offset-2 decoration-accent/40 hover:decoration-accent transition-colors focus-ring rounded"
-              >
+              <Button variant="link" size="sm" onClick={onManualModeEnter} className="h-auto p-0">
                 Skip & Enter Manual Mode
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -102,18 +94,12 @@ export const GeneratingScreen: React.FC<GeneratingScreenProps> = ({
               </div>
             </div>
             <div className="flex gap-3 pl-8 flex-wrap">
-              <button
-                onClick={onResetAuth}
-                className="px-4 py-2 bg-danger/20 hover:bg-danger/30 text-danger text-xs font-medium rounded-lg transition-colors border border-danger/40 focus-ring"
-              >
+              <Button variant="outline" size="sm" onClick={onResetAuth}>
                 Update API Key
-              </button>
-              <button
-                onClick={onManualModeEnter}
-                className="px-4 py-2 bg-surface-elevated hover:bg-edge text-ink-muted text-xs font-medium rounded-lg transition-colors border border-edge focus-ring"
-              >
+              </Button>
+              <Button variant="outline" size="sm" onClick={onManualModeEnter}>
                 Continue in Manual Mode
-              </button>
+              </Button>
             </div>
           </div>
         )}

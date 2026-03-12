@@ -1,4 +1,4 @@
-import { SRTItem } from '@/types.ts';
+import { SRTItem } from '../../types';
 
 const timeToSeconds = (timeString: string): number => {
   const [hours, minutes, seconds] = timeString.split(':');

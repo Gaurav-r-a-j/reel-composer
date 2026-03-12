@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { LayoutConfigStep, SRTItem } from '@/types.ts';
+import { LayoutConfigStep, SRTItem } from '../../types';
 import { Play, Pause, RefreshCw, Maximize, Minimize, Video, StopCircle, Loader2 } from 'lucide-react';
 import html2canvas from 'html2canvas';
-import { encodeReelToMp4 } from '@/src/utils/encodeExport.ts';
+import { encodeReelToMp4 } from '@/utils/encodeExport';
 
 interface ReelPlayerProps {
   videoUrl: string;

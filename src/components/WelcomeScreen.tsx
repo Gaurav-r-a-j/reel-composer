@@ -1,8 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, ShieldCheck, AlertTriangle, ExternalLink, PlayCircle } from 'lucide-react';
-import { validateGeminiConnection } from '@/src/services/geminiService.ts';
-import { APP_CONFIG } from '@/config.ts';
+import { validateGeminiConnection } from '@/services/geminiService';
+import { APP_CONFIG } from '../../config';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface WelcomeScreenProps {
   onComplete: (apiKey: string | null, model?: string, saveManualMode?: boolean) => void;
@@ -77,22 +79,19 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
         <div className="w-full space-y-5 animate-fade-in">
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <label htmlFor="welcome-api-key" className="text-sm font-medium text-ink-muted">Google Gemini API Key</label>
+              <Label htmlFor="welcome-api-key">Google Gemini API Key</Label>
               <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-xs text-accent hover:text-accent-hover flex items-center gap-1 font-medium transition-colors focus-ring rounded">
                 <ExternalLink size={12} /> Get Free Key
               </a>
             </div>
-            <div className="relative">
-              <input
-                id="welcome-api-key"
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Paste your API Key here (AIzaSy...)"
-                className="w-full bg-surface-elevated border border-edge rounded-xl px-4 py-3.5 text-ink focus:border-accent focus:ring-2 focus:ring-accent/30 outline-none transition-all font-mono text-sm placeholder-ink-subtle focus-ring"
-                autoComplete="off"
-              />
-            </div>
+            <Input
+              id="welcome-api-key"
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="Paste your API Key here (AIzaSy...)"
+              autoComplete="off"
+            />
             <div className="flex items-start gap-2">
               <ShieldCheck className="text-success shrink-0 mt-0.5 opacity-90" size={14} />
               <p className="text-[11px] text-ink-subtle leading-snug">
@@ -101,14 +100,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
             </div>
           </div>
 
-          <button
+          <Button
             onClick={handleValidation}
             disabled={isValidating}
-            className={`w-full py-4 rounded-xl font-semibold text-base transition-all flex items-center justify-center gap-3 focus-ring ${
-              isValidating
-                ? 'bg-surface-elevated cursor-not-allowed text-ink-subtle'
-                : 'bg-white text-[#0c0c0f] hover:bg-gray-100 active:scale-[0.99]'
-            }`}
+            className="w-full h-auto py-4"
           >
             {isValidating ? (
               <span className="flex items-center gap-3">
@@ -118,7 +113,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
             ) : (
               <>Enter Studio <ArrowRight size={20} /></>
             )}
-          </button>
+          </Button>
 
           {error && (
             <div className="p-4 bg-danger-muted border border-danger/30 rounded-xl text-danger text-sm flex items-center justify-center gap-2 animate-shake text-center">
@@ -127,12 +122,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
           )}
 
           <div className="pt-5 border-t border-edge text-center">
-            <button
-              onClick={handleManualSkip}
-              className="text-xs text-ink-subtle hover:text-ink-muted transition-colors focus-ring rounded py-1"
-            >
+            <Button variant="ghost" size="sm" onClick={handleManualSkip} className="h-auto py-1">
               Or enter manual mode (No AI features)
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -1,17 +1,17 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FileUpload} from '@/src/components/FileUpload.tsx';
-import {WelcomeScreen} from '@/src/components/WelcomeScreen.tsx';
-import {MobileBlocker} from '@/src/components/MobileBlocker.tsx';
-import {AppHeader} from '@/src/components/AppHeader.tsx';
-import {GeneratingScreen} from '@/src/components/GeneratingScreen.tsx';
-import {EditorView} from '@/src/views/EditorView.tsx';
-import {Snackbar} from '@/src/components/Snackbar.tsx';
-import {ReplaceSceneDialog} from '@/src/components/ReplaceSceneDialog.tsx';
-import {parseSRT} from '@/src/utils/srtParser.ts';
-import {AppState, GeneratedContent, SRTItem} from '../types.ts';
-import {generateReelContent} from '@/src/services/geminiService.ts';
-import {APP_CONFIG} from '../config.ts';
-import {constructPrompt, EXAMPLE_HTML, EXAMPLE_JSON, EXAMPLE_SRT, EXAMPLE_TOPIC} from '@/src/utils/promptTemplates.ts';
+import { FileUpload } from '@/components/FileUpload';
+import { WelcomeScreen } from '@/components/WelcomeScreen';
+import { MobileBlocker } from '@/components/MobileBlocker';
+import { AppHeader } from '@/components/AppHeader';
+import { GeneratingScreen } from '@/components/GeneratingScreen';
+import { EditorView } from '@/views/EditorView';
+import { Snackbar } from '@/components/Snackbar';
+import { ReplaceSceneDialog } from '@/components/ReplaceSceneDialog';
+import { parseSRT } from '@/utils/srtParser';
+import { AppState, GeneratedContent, SRTItem } from '../types';
+import { generateReelContent } from '@/services/geminiService';
+import { APP_CONFIG } from '../config';
+import { constructPrompt, EXAMPLE_HTML, EXAMPLE_JSON, EXAMPLE_SRT, EXAMPLE_TOPIC } from '@/utils/promptTemplates';
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(() => {

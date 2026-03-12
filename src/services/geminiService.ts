@@ -1,8 +1,8 @@
 
 import { GoogleGenAI, Type, Schema, Modality } from "@google/genai";
-import { GeneratedContent } from "@/types.ts";
-import { constructPrompt } from "@/src/utils/promptTemplates.ts";
-import { fileToBase64, pcmToWav, extractAudioBlob } from "@/src/utils/audioHelpers.ts";
+import { GeneratedContent } from "../../types";
+import { constructPrompt } from "@/utils/promptTemplates";
+import { fileToBase64, pcmToWav, extractAudioBlob } from "@/utils/audioHelpers";
 
 export const validateGeminiConnection = async (apiKey: string, modelName: string): Promise<boolean> => {
   if (!apiKey) return false;

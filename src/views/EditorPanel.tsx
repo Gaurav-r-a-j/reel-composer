@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {GeneratedContent, LayoutConfigStep} from '@/types.ts';
+import { GeneratedContent, LayoutConfigStep } from '../../types';
 import {
   Bot,
   BrainCircuit,
@@ -28,10 +28,10 @@ import {
   Trash2,
   X
 } from 'lucide-react';
-import {extractWavFromVideo} from '@/src/utils/audioHelpers.ts';
-import {constructPrompt} from '@/src/utils/promptTemplates.ts';
-import {validateGeminiConnection} from '@/src/services/geminiService.ts';
-import {APP_CONFIG} from '@/config.ts';
+import { extractWavFromVideo } from '@/utils/audioHelpers';
+import { constructPrompt } from '@/utils/promptTemplates';
+import { validateGeminiConnection } from '@/services/geminiService';
+import { APP_CONFIG } from '../../config';
 
 interface EditorPanelProps {
   content: GeneratedContent;

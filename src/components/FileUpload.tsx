@@ -1,8 +1,9 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, FileVideo, FileText, ArrowRight, Download, ExternalLink, Music, Wand2, Mic, Play, FileAudio, Disc, Video, Clapperboard, Sparkles, CheckSquare, Edit2, Save, X, Headphones, Trash2, ArrowLeft, BookOpen, Globe, Github, Linkedin, Instagram, Facebook } from 'lucide-react';
-import { extractWavFromVideo } from '@/src/utils/audioHelpers.ts';
-import { generateSRT, generateTTS } from '@/src/services/geminiService.ts';
+import { extractWavFromVideo } from '@/utils/audioHelpers';
+import { generateSRT, generateTTS } from '@/services/geminiService';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 interface FileUploadProps {
   onFilesSelected: (videoFile: File, srtFile: File, isAudioOnly: boolean) => void;
@@ -312,20 +313,20 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                     )}
                 </>
             ) : (
-                <div className="flex flex-col h-full w-full bg-page">
+                    <div className="flex flex-col h-full w-full bg-page">
                     <div className="flex items-center justify-between px-4 py-2 border-b border-edge bg-surface-elevated">
                         <span className="text-xs font-semibold text-ink-muted">Editing Subtitles</span>
-                        <button type="button" onClick={() => setIsEditingSrt(false)} className="text-ink-muted hover:text-ink p-1 rounded"><X size={14} /></button>
+                        <Button type="button" variant="ghost" size="icon-xs" onClick={() => setIsEditingSrt(false)}><X size={14} /></Button>
                     </div>
-                    <textarea
+                    <Textarea
                         value={srtContent}
                         onChange={(e) => setSrtContent(e.target.value)}
-                        className="flex-1 w-full bg-page p-3 text-xs font-mono text-success outline-none resize-none border-0 focus:ring-0"
+                        className="flex-1 w-full min-h-0 font-mono text-xs rounded-none border-0 resize-none"
                         spellCheck={false}
                     />
-                    <button type="button" onClick={handleSrtSave} className="w-full py-2.5 bg-success hover:opacity-90 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-opacity">
+                    <Button type="button" onClick={handleSrtSave} className="w-full rounded-none">
                         <Save size={12} /> Save Changes
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>
@@ -473,15 +474,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                     <button onClick={() => setTtsVoice('male')} className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-all ${ttsVoice === 'male' ? 'bg-blue-600/20 border-blue-500 text-blue-300' : 'bg-black/40 border-gray-700 text-gray-400 hover:border-gray-600'}`}>Male</button>
                                     <button onClick={() => setTtsVoice('female')} className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-all ${ttsVoice === 'female' ? 'bg-pink-600/20 border-pink-500 text-pink-300' : 'bg-black/40 border-gray-700 text-gray-400 hover:border-gray-600'}`}>Female</button>
                                 </div>
-                                <textarea 
+                                <Textarea
                                     value={ttsScript}
                                     onChange={(e) => setTtsScript(e.target.value)}
                                     placeholder="Type script here..."
-                                    className="flex-1 w-full bg-black/40 border border-gray-700 rounded-xl p-3 text-white focus:border-pink-500 outline-none resize-none text-xs leading-relaxed"
+                                    className="flex-1 min-h-0 w-full resize-none text-xs"
                                 />
-                                <button onClick={handleGenerateTTS} disabled={isGeneratingAudio || !ttsScript || !apiKey} className="w-full py-2 rounded-lg font-bold text-xs bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white shadow-lg disabled:opacity-50">
+                                <Button onClick={handleGenerateTTS} disabled={isGeneratingAudio || !ttsScript || !apiKey} className="w-full">
                                     {isGeneratingAudio ? "Synthesizing..." : "Generate Audio (AI)"}
-                                </button>
+                                </Button>
                             </div>
                         )}
 
@@ -517,27 +518,26 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
             <div className="flex justify-center w-full">
                 <div className="flex items-center gap-4 w-full max-w-md">
                     {/* BACK BUTTON */}
-                    <button
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-lg"
                         onClick={onBack}
-                        className="w-16 h-16 rounded-full border border-gray-700 bg-gray-800/50 hover:bg-gray-700 hover:border-gray-600 hover:text-white text-gray-400 flex items-center justify-center transition-all shadow-lg hover:scale-105"
+                        className="w-16 h-16 rounded-full"
                         title="Change API Key / Back"
                     >
                         <ArrowLeft size={24} />
-                    </button>
+                    </Button>
 
                     {/* ENTER STUDIO BUTTON */}
-                    <button
+                    <Button
                         onClick={handleNext}
                         disabled={activeTab === 'video' ? (!videoFile || !currentSrt) : (!(generatedAudioFile || audioFile) || !currentSrt)}
-                        className={`flex-1 group relative overflow-hidden flex items-center justify-center space-x-3 h-16 rounded-full font-black text-lg transition-all transform shadow-2xl ${
-                        (activeTab === 'video' ? (videoFile && currentSrt) : ((generatedAudioFile || audioFile) && currentSrt))
-                            ? 'bg-white text-black hover:scale-[1.02] hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)]' 
-                            : 'bg-gray-800 text-gray-600 cursor-not-allowed'
-                        }`}
+                        className="flex-1 h-16 rounded-full gap-3 text-lg font-black"
                     >
-                        <span className="relative z-10">{activeTab === 'video' ? 'Enter Studio' : 'Compose Visualizer'}</span>
-                        <ArrowRight size={24} className="relative z-10" />
-                    </button>
+                        {activeTab === 'video' ? 'Enter Studio' : 'Compose Visualizer'}
+                        <ArrowRight size={24} />
+                    </Button>
                 </div>
             </div>
 

@@ -53,9 +53,13 @@ Generative AI needs context. Convert your video/audio into an SRT subtitle file.
 The built-in editor allows you to tweak the code.
 *   *Workflow Tip:* If the animation isn't quite right, copy the generated code, paste it into **ChatGPT/Claude/Gemini**, and say: *"Make the particles faster"* or *"Change the color to green"*. Paste the updated code back into the Editor Panel.
 
-### 5. Export
-Record the final composition directly from the browser to get a polished `.webm` or `.mp4` file ready for social media.
-*   *Recommended Tool:* **[OBS Studio](https://obsproject.com/)** or standard screen recording software to capture the playback.
+### 5. Export (no server, no local script)
+Two in-browser options:
+
+*   **Export (encode)** — No recording. Click **Export (encode)** in the player. The app captures each frame, encodes with FFmpeg.wasm in the browser, and downloads an MP4. One click; no tab sharing. First run will load FFmpeg.wasm (~31 MB once).
+*   **Export (browser)** — Records the tab. Click **Export (browser)**, share the tab when asked, then stop when done; a `.webm`/`.mp4` downloads.
+
+Optional **Puppeteer + FFmpeg** (local script): In **AI & Audio** → **Local render (Puppeteer)** download `composition.json`, then run `npm run render-reel -- -c composition.json -v video.mp4 -o out.mp4` on your machine.
 
 ---
 
@@ -84,27 +88,34 @@ npm run dev
 
 You can configure this in two ways:
 
-1.  **Config File (Recommended for Dev):**
-    Open `config.ts` and paste your key into `DEFAULT_API_KEY`.
-    ```typescript
-    export const APP_CONFIG = {
-      DEFAULT_API_KEY: "PASTE_YOUR_KEY_HERE",
-      // ...
-    };
+1.  **Environment variable (recommended, keeps key out of git):**
+    Copy `.env.example` to `.env` or `.env.local` and set:
+    ```bash
+    VITE_GEMINI_API_KEY=your_key_here
     ```
+    Optional: `VITE_GEMINI_DEFAULT_MODEL=gemini-2.5-flash` (or `gemini-2.5-pro`).
 
-2.  **UI Settings (Portable):**
-    Enter your key directly in the application's **Settings Panel** (Internal Generator section). The key is stored securely in your browser's `localStorage`.
+2.  **UI Settings (portable):**
+    Enter your key in the app's **Settings** (AI & Audio → Internal Generator). The key is stored in your browser's `localStorage`.
 
 ---
 
 ## 🛠️ Tech Stack
 
 *   **Framework:** React 19 + TypeScript
+*   **Local export:** Puppeteer (Apache 2.0) + FFmpeg for headless MP4 render
 *   **Styling:** Tailwind CSS
 *   **AI Integration:** Google GenAI SDK (Gemini 2.5 Flash / Pro)
 *   **Animation Engine:** GSAP (GreenSock Animation Platform)
 *   **Icons:** Lucide React
+
+---
+
+## 🎯 Animation sync (SRT as timeline)
+
+The player drives the overlay by **video time**: the app sends `timeupdate` to the iframe and the GSAP timeline does `tl.seek(time)`. If the AI-generated timeline doesn’t match the SRT, captions and visuals can desync.
+
+A more robust approach is **SRT as the single source of truth**: build the GSAP timeline from SRT segment start/end times (e.g. one animation block per segment), so layout and captions are always aligned. Future versions may offer this “SRT-driven timeline” mode.
 
 ---
 

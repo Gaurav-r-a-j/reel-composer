@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { LayoutConfigStep, SRTItem } from '@/types.ts';
-import { Play, Pause, RefreshCw, Maximize, Minimize, Video, StopCircle, X, AlertTriangle, Monitor } from 'lucide-react';
+import { Play, Pause, RefreshCw, Maximize, Minimize, Video, StopCircle, Loader2 } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import { encodeReelToMp4 } from '@/src/utils/encodeExport.ts';
 
 interface ReelPlayerProps {
   videoUrl: string;
@@ -44,16 +46,18 @@ export const ReelPlayer: React.FC<ReelPlayerProps> = ({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
-  const [showExportInfo, setShowExportInfo] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const [isEncoding, setIsEncoding] = useState(false);
+  const [exportTime, setExportTime] = useState(0);
+  const [encodeProgress, setEncodeProgress] = useState<{ message: string; pct: number } | null>(null);
+  const frameReadyResolveRef = useRef<(() => void) | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Key to force re-render iframe on restart
   const [iframeKey, setIframeKey] = useState(0);
 
-  // --- Computed State based on Time ---
+  const displayTime = isEncoding ? exportTime : currentTime;
   const currentLayout = useMemo(() => {
-    // 1. Try to find the specific layout step for the current time
-    const match = layoutConfig.find(step => currentTime >= step.startTime && currentTime < step.endTime);
+    const match = layoutConfig.find(step => displayTime >= step.startTime && displayTime < step.endTime);
     if (match) return match;
 
     // 2. If no match, check if we are past the last step (keep the final state)
@@ -72,11 +76,11 @@ export const ReelPlayer: React.FC<ReelPlayerProps> = ({
       startTime: 0,
       endTime: 9999
     };
-  }, [currentTime, layoutConfig]);
+  }, [displayTime, layoutConfig]);
 
   const currentCaption = useMemo(() => {
-    return srtData.find(item => currentTime >= item.startTime && currentTime <= item.endTime);
-  }, [currentTime, srtData]);
+    return srtData.find(item => displayTime >= item.startTime && displayTime <= item.endTime);
+  }, [displayTime, srtData]);
 
   // --- Styles calculation ---
   const getLayoutStyles = () => {
@@ -146,6 +150,27 @@ export const ReelPlayer: React.FC<ReelPlayerProps> = ({
   const layoutStyles = getLayoutStyles();
   const captionStyle = getCaptionStyle();
   const isFullHtml = currentLayout.layoutMode === 'full-html';
+
+  useEffect(() => {
+    if (!isEncoding || !videoRef.current || !iframeRef.current?.contentWindow) return;
+    const video = videoRef.current;
+    const onSeeked = () => {
+      iframeRef.current?.contentWindow?.postMessage({ type: 'timeupdate', time: exportTime }, '*');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          frameReadyResolveRef.current?.();
+          frameReadyResolveRef.current = null;
+        });
+      });
+    };
+    if (Math.abs(video.currentTime - exportTime) < 0.02) {
+      onSeeked();
+      return;
+    }
+    video.currentTime = exportTime;
+    video.addEventListener('seeked', onSeeked, { once: true });
+    return () => video.removeEventListener('seeked', onSeeked);
+  }, [isEncoding, exportTime]);
 
   // --- Word-by-Word Animation Logic (With Chunking) ---
   const renderAnimatedCaption = () => {
@@ -470,6 +495,48 @@ export const ReelPlayer: React.FC<ReelPlayerProps> = ({
     }
   };
 
+  const startEncodeExport = async () => {
+    if (!containerRef.current || !videoRef.current || !videoUrl) return;
+    const video = videoRef.current;
+    const dur = Number.isFinite(duration) ? duration : video.duration;
+    if (!(dur > 0)) {
+      alert("Load the video first.");
+      return;
+    }
+    setIsEncoding(true);
+    setEncodeProgress({ message: "Preparing...", pct: 0 });
+    try {
+      const videoBlob = await fetch(videoUrl).then((r) => r.blob());
+      const captureFrame = async (t: number): Promise<HTMLCanvasElement | null> => {
+        const p = new Promise<void>((r) => { frameReadyResolveRef.current = r; });
+        setExportTime(t);
+        await p;
+        if (!containerRef.current) return null;
+        return await html2canvas(containerRef.current, { useCORS: true, scale: 1 });
+      };
+      const blob = await encodeReelToMp4({
+        captureFrame,
+        videoBlob,
+        duration: dur,
+        width: 360,
+        height: 640,
+        onProgress: (message, pct) => setEncodeProgress({ message, pct }),
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `reel-encode-${Date.now()}.mp4`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Encode export failed", err);
+      alert(err instanceof Error ? err.message : "Encode failed.");
+    } finally {
+      setIsEncoding(false);
+      setEncodeProgress(null);
+    }
+  };
+
   const stopRecording = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
       mediaRecorderRef.current.stop();
@@ -482,6 +549,7 @@ export const ReelPlayer: React.FC<ReelPlayerProps> = ({
     <div className={`flex flex-col items-center justify-center ${fullScreenMode ? 'fixed inset-0 z-50 bg-black' : 'h-full'}`}>
 
       <div
+        ref={containerRef}
         className="relative bg-black overflow-hidden shadow-2xl border border-gray-800"
         style={{
           width: fullScreenMode ? '100vh' : '360px',
@@ -543,7 +611,7 @@ export const ReelPlayer: React.FC<ReelPlayerProps> = ({
               {isPlaying ? <Pause size={20} /> : <Play size={20} />}
             </button>
             <span className="text-xs font-mono text-white/80 bg-black/40 px-2 py-1 rounded">
-              {currentTime.toFixed(1)}s / {duration.toFixed(1)}s
+              {currentTime.toFixed(1)}s / {Number.isFinite(duration) ? duration.toFixed(1) : '--'}s
             </span>
             <button onClick={restart} className="p-2 bg-white/20 hover:bg-white/40 backdrop-blur rounded-full text-white" title="Restart & Reload HTML">
               <RefreshCw size={20} />
@@ -553,10 +621,11 @@ export const ReelPlayer: React.FC<ReelPlayerProps> = ({
       </div>
 
       {!isRecording && (
-        <div className="mt-4 flex gap-4">
+        <div className="mt-4 flex flex-wrap gap-3">
            <button
             onClick={togglePlay}
-            className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition-colors"
+            disabled={isEncoding}
+            className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition-colors disabled:opacity-50"
           >
             {isPlaying ? <Pause size={18} /> : <Play size={18} />}
             {isPlaying ? 'Pause' : 'Play'}
@@ -564,74 +633,43 @@ export const ReelPlayer: React.FC<ReelPlayerProps> = ({
 
           <button
             onClick={toggleFullScreen}
-            className="flex items-center gap-2 px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors"
+            disabled={isEncoding}
+            className="flex items-center gap-2 px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors disabled:opacity-50"
           >
             {fullScreenMode ? <Minimize size={18} /> : <Maximize size={18} />}
             {fullScreenMode ? 'Exit Fullscreen' : 'Fullscreen Preview'}
           </button>
 
           <button
-            onClick={() => setShowExportInfo(true)}
-            className="flex items-center gap-2 px-6 py-2 bg-red-600 hover:bg-red-500 rounded-lg font-medium transition-colors shadow-lg shadow-red-900/20"
+            onClick={() => startRecording()}
+            disabled={isEncoding}
+            className="flex items-center gap-2 px-6 py-2 bg-red-600 hover:bg-red-500 rounded-lg font-medium transition-colors shadow-lg shadow-red-900/20 disabled:opacity-50"
           >
             <Video size={18} />
-            Rec & Export
+            Export (browser)
+          </button>
+
+          <button
+            onClick={startEncodeExport}
+            disabled={isEncoding}
+            className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-medium transition-colors shadow-lg shadow-emerald-900/20 disabled:opacity-50"
+          >
+            {isEncoding ? <Loader2 size={18} className="animate-spin" /> : <Video size={18} />}
+            Export (encode)
           </button>
         </div>
       )}
 
-      {/* Export Information Modal */}
-      {showExportInfo && (
-        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-           <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-md w-full shadow-2xl relative">
-              <button
-                onClick={() => setShowExportInfo(false)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-white"
-              >
-                <X size={20} />
-              </button>
-
-              <div className="flex items-center gap-3 mb-4 text-amber-500">
-                <AlertTriangle size={24} />
-                <h3 className="text-lg font-bold text-white">Export Unavailable</h3>
-              </div>
-
-              <p className="text-gray-300 text-sm mb-4 leading-relaxed">
-                Server-side FFmpeg recording is currently <strong>disabled</strong> for the Public Preview.
-              </p>
-
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg mb-6 text-xs text-red-200 font-mono">
-                 "Running video rendering for everyone for free would melt my servers! 🔥"
-              </div>
-
-              <div className="bg-black/40 p-4 rounded-lg border border-gray-800 mb-6">
-                <h4 className="font-bold text-white text-sm mb-2 flex items-center gap-2">
-                   <Monitor size={14} className="text-purple-400"/> Recommendation:
-                </h4>
-                <p className="text-xs text-gray-400">
-                  Use <strong>OBS Studio</strong> or your system's screen recorder to capture the playback in high quality.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                 <button
-                   onClick={() => setShowExportInfo(false)}
-                   className="w-full py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors text-sm"
-                 >
-                   Got it, I'll use OBS
-                 </button>
-
-                 <button
-                   onClick={() => {
-                     setShowExportInfo(false);
-                     startRecording();
-                   }}
-                   className="text-[10px] text-gray-500 hover:text-gray-300 underline"
-                 >
-                   Try Browser Recorder (Experimental/Client-Side)
-                 </button>
-              </div>
-           </div>
+      {encodeProgress && (
+        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full text-center">
+            <Loader2 className="w-10 h-10 animate-spin text-emerald-500 mx-auto mb-3" />
+            <p className="text-white font-medium">{encodeProgress.message}</p>
+            <p className="text-gray-400 text-sm mt-1">{Math.round(encodeProgress.pct)}%</p>
+            <div className="mt-3 h-2 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 transition-all duration-300" style={{ width: `${encodeProgress.pct}%` }} />
+            </div>
+          </div>
         </div>
       )}
 

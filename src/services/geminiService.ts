@@ -27,7 +27,7 @@ const formatSRTTimestamp = (seconds: number): string => {
   const iso = date.toISOString();
   // ISO is YYYY-MM-DDTHH:mm:ss.sssZ
   // We need HH:mm:ss,sss
-  const timePart = iso.substr(11, 12).replace('.', ',');
+  const timePart = iso.slice(11, 23).replace('.', ',');
   return timePart;
 };
 
@@ -188,6 +188,11 @@ export const generateReelContent = async (
     You are a world-class Motion Graphics Designer and Creative Technologist for high-retention social media video (Reels/TikTok).
     Your goal is to generate or refine a visual composition that transforms a raw transcript into an immersive, "edutainment" style video experience.
 
+    ### REEL FORMAT (MANDATORY)
+    This output is ONLY for 9:16 portrait reels (Instagram Reels / TikTok / Shorts). Every visual must respect this.
+    - **Aspect ratio:** All HTML/CSS must assume a 9:16 viewport. Use \`aspect-ratio: 9 / 16\`, \`width: 100vw; height: 100vh\` with 9:16, or \`max-aspect-ratio\` so nothing is cropped or stretched.
+    - **Layout:** Split ratios and positioning are applied within the 9:16 frame. Design all elements and animations to fit and read well in portrait 9:16.
+
     ### DESIGN SYSTEM & AESTHETIC
     You must output high-fidelity, polished UI/UX animation.
     1. **Color Palette**: Use CSS variables. Dark background (#050505), Neon accents.
@@ -226,7 +231,7 @@ export const generateReelContent = async (
     ### CODING RULES
     - **NO SINGLE-LINE COMMENTS**: Use \`/* */\` block comments only.
     - **USE TEMPLATE LITERALS**: Backticks (\`) for all strings.
-    - try not to clip out or overlap elements, design elements and animsation utilising the split ratio's html part screen realesate
+    - Do not clip or overlap elements; design for the 9:16 HTML area and use the split-ratio screen space properly.
     ### LAYOUT CONFIG REQUIREMENTS
     - 'layoutMode': 'split', 'full-video', 'full-html'.
     - 'splitRatio': e.g., 0.60 (HTML takes top 60%).
@@ -331,10 +336,8 @@ export const generateReelContent = async (
             })();
         </script>`;
 
-        // Inject immediately after <head> for earliest execution
-        result.html = result.html.replace('<head>', '<head>' + reelHelperScript);
+        result.html = result.html.replace(/<head([^>]*)>/i, '<head$1>' + reelHelperScript);
     }
-    // -----------------------------
 
     return result as GeneratedContent;
   } catch (error: any) {

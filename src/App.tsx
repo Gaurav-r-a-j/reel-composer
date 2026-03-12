@@ -48,7 +48,7 @@ const App: React.FC = () => {
 
   // Settings State
   const [apiKey, setApiKey] = useState(() => {
-    return localStorage.getItem('gemini_api_key') || "";
+    return localStorage.getItem('gemini_api_key') || APP_CONFIG.DEFAULT_API_KEY || "";
   });
   const [modelName, setModelName] = useState(() => {
     return localStorage.getItem('gemini_model_pref') || APP_CONFIG.DEFAULT_MODEL;
@@ -194,10 +194,13 @@ const App: React.FC = () => {
     }
 
     const prompt = constructPrompt(currentTopic, currentSrtRaw);
-    navigator.clipboard.writeText(prompt);
-
-    setShowSnackbar(true);
-    setTimeout(() => setShowSnackbar(false), 3000);
+    try {
+      await navigator.clipboard.writeText(prompt);
+      setShowSnackbar(true);
+      setTimeout(() => setShowSnackbar(false), 3000);
+    } catch {
+      // clipboard unavailable
+    }
 
     // If NO API KEY -> Force Manual Mode
     if (!apiKey.trim()) {
@@ -307,7 +310,7 @@ const App: React.FC = () => {
         {appState === AppState.WELCOME ? (
           <WelcomeScreen onComplete={handleWelcomeComplete}/>
         ) : (
-          <div className="w-full h-screen flex flex-col bg-gray-950 text-white overflow-hidden relative">
+          <div className="w-full h-screen flex flex-col bg-page text-ink overflow-hidden relative">
             {/* Header */}
             {!isFullScreen && appState !== AppState.UPLOAD && (
               <AppHeader

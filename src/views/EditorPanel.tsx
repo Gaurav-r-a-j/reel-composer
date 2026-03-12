@@ -177,10 +177,25 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
   const handleCopyPrompt = () => {
     const prompt = constructPrompt(topicContext, srtText);
-    navigator.clipboard.writeText(prompt);
-    setCopySuccess(true);
-    setTimeout(() => setCopySuccess(false), 2000);
-  }
+    try {
+      navigator.clipboard.writeText(prompt);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch {
+      // clipboard unavailable
+    }
+  };
+
+  const handleExportForPuppeteer = () => {
+    const composition = { overlayHtml: content.html, layoutConfig: content.layoutConfig, srtText };
+    const blob = new Blob([JSON.stringify(composition, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "composition.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleMusicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -397,6 +412,23 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                    )}
                 </div>
               )}
+            </div>
+
+            {/* Local export (Puppeteer + FFmpeg) */}
+            <div className="bg-gray-800/50 p-4 rounded-lg space-y-3">
+              <h3 className="font-bold text-white flex items-center gap-2">
+                <Download size={16} /> Local render (Puppeteer)
+              </h3>
+              <p className="text-[10px] text-gray-400 mb-2">Download composition, then run locally to export MP4. Requires Node, Puppeteer, FFmpeg.</p>
+              <button
+                onClick={handleExportForPuppeteer}
+                className="w-full flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 py-2 rounded text-white text-xs transition-colors"
+              >
+                <Download size={14} /> Download composition.json
+              </button>
+              <p className="text-[10px] text-gray-500 font-mono break-all">
+                npm run render-reel -- -c composition.json -v video.mp4 -o out.mp4
+              </p>
             </div>
 
             {/* External Intelligence */}

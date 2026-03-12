@@ -181,10 +181,11 @@ REQUEST:
 Please provide two separate pieces of code following the Reference Example's quality:
 
 ### 1. HTML/CSS/JS Animation
-Create a stunning, self-contained HTML file.
+Create a stunning, self-contained HTML file for a **9:16 portrait reel only**.
+- **Aspect ratio:** All visuals must be designed for 9:16 portrait. Use \`aspect-ratio: 9/16\` or equivalent so layout and animations fit the reel frame; avoid anything that assumes landscape or square.
 - **Libraries:** You MUST use GSAP (GreenSock) for animations.
 - **Syncing:** The app sends 'timeupdate', 'play', 'pause' events via window.postMessage. The JS must listen to these.
-- **Design:** Dark mode, Neon accents, Glassmorphism. 9:16 Portrait aspect ratio.
+- **Design:** Dark mode, Neon accents, Glassmorphism. Everything must fit and read correctly in 9:16.
 - **Code Structure:** NO unescaped newlines in strings. Use template literals.
 
 ### 2. Layout Configuration (JSON)

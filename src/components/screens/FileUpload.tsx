@@ -395,7 +395,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                 </div>
                                 <div className="text-center space-y-1">
                                     <p className="font-semibold text-foreground">Select video</p>
-                                    <p className="text-xs text-muted-foreground">MP4, MOV, WEBM</p>
+                                    <p className="text-xs text-muted-foreground">MP4, MOV, WEBM · or drag and drop</p>
                                 </div>
                             </label>
                         )}
@@ -450,7 +450,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                         </div>
                                         <div className="text-center space-y-1">
                                             <p className="font-semibold text-foreground">Drop audio file</p>
-                                            <p className="text-xs text-muted-foreground">WAV, MP3, M4A</p>
+                                            <p className="text-xs text-muted-foreground">WAV, MP3, M4A · or drag and drop</p>
                                         </div>
                                     </label>
                                 )}
@@ -508,27 +508,39 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
             </Card>
 
             <div className="flex flex-col items-center gap-6 pt-4">
-                <div className="flex items-center gap-4 w-full max-w-md">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="lg"
-                        onClick={onBack}
-                        className="shrink-0 rounded-xl h-12 px-5 gap-2"
-                        title="Change API Key / Back"
-                    >
-                        <ArrowLeft className="size-5" /> Back
-                    </Button>
-                    <Button
-                        variant="gradient"
-                        onClick={handleNext}
-                        disabled={activeTab === 'video' ? (!videoFile || !currentSrt) : (!(generatedAudioFile || audioFile) || !currentSrt)}
-                        className="flex-1 h-12 rounded-xl gap-2 text-base font-semibold"
-                        size="lg"
-                    >
-                        {activeTab === 'video' ? 'Enter Studio' : 'Compose Visualizer'}
-                        <ArrowRight className="size-5 shrink-0" />
-                    </Button>
+                <div className="flex flex-col gap-3 w-full max-w-md">
+                    <div className="flex items-center gap-4">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="lg"
+                            onClick={onBack}
+                            className="shrink-0 rounded-xl h-12 px-5 gap-2"
+                            title="Change API Key / Back"
+                        >
+                            <ArrowLeft className="size-5" /> Back
+                        </Button>
+                        <Button
+                            variant="gradient"
+                            onClick={handleNext}
+                            disabled={activeTab === 'video' ? (!videoFile || !currentSrt) : (!(generatedAudioFile || audioFile) || !currentSrt)}
+                            className="flex-1 h-12 rounded-xl gap-2 text-base font-semibold"
+                            size="lg"
+                        >
+                            {activeTab === 'video' ? 'Enter Studio' : 'Compose Visualizer'}
+                            <ArrowRight className="size-5 shrink-0" />
+                        </Button>
+                    </div>
+                    {activeTab === 'video' && (!videoFile || !currentSrt) && (
+                        <p className="text-xs text-muted-foreground text-center">
+                            {!videoFile && !currentSrt ? 'Add a video and captions to continue.' : !videoFile ? 'Add a video to continue.' : 'Add captions to continue.'}
+                        </p>
+                    )}
+                    {activeTab === 'audio' && (!(generatedAudioFile || audioFile) || !currentSrt) && (
+                        <p className="text-xs text-muted-foreground text-center">
+                            {!(generatedAudioFile || audioFile) && !currentSrt ? 'Add audio and captions to continue.' : !(generatedAudioFile || audioFile) ? 'Add audio to continue.' : 'Add captions to continue.'}
+                        </p>
+                    )}
                 </div>
                 <p className="text-xs text-muted-foreground">
                     Need captions?{' '}

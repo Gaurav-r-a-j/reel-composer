@@ -1,10 +1,18 @@
 import React from 'react';
-import { LayoutTemplate, AlertCircle, Edit3, Play } from 'lucide-react';
+import { LayoutTemplate, AlertCircle, Edit3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ModeToggle } from '@/components/layout/ModeToggle';
+
+const TOPIC_TEMPLATES: { label: string; value: string }[] = [
+  { label: 'Tech tutorial', value: 'Tech tutorial: clean code walkthrough, screen recordings, and simple diagrams. Modern UI and developer tools.' },
+  { label: 'Product demo', value: 'Product demo: feature highlights, smooth transitions, and clear call-to-actions. Professional and polished.' },
+  { label: 'Space & science', value: 'Space and science: cosmic visuals, planets, stars, and abstract motion. Educational and awe-inspiring.' },
+  { label: 'Education / explainer', value: 'Education explainer: clear visuals, step-by-step graphics, and friendly tone. Easy to follow.' },
+  { label: 'Talking head / vlog', value: 'Talking head vlog: minimal overlays, lower-thirds, and B-roll cutaways. Personal and engaging.' },
+  { label: 'Abstract / minimal', value: 'Abstract and minimal: subtle motion, gradients, and typography. Calm and modern.' },
+];
 
 interface GeneratingScreenProps {
   isAudioOnly: boolean;
@@ -41,18 +49,6 @@ export const GeneratingScreen: React.FC<GeneratingScreenProps> = ({
 
   return (
     <div className="flex flex-col h-full overflow-auto bg-background">
-      <header className="shrink-0 border-b border-border bg-background/95 backdrop-blur-sm z-10">
-        <div className="container flex items-center justify-between h-14">
-          <div className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] flex items-center justify-center">
-              <Play className="size-4 text-white" />
-            </div>
-            <span className="font-semibold text-foreground">Reel Composer</span>
-          </div>
-          <ModeToggle />
-        </div>
-      </header>
-
       <div className="flex-1 flex flex-col items-center justify-center w-full animate-fade-in py-8">
         <div className="container w-full flex justify-center px-4">
           <Card className="w-full max-w-2xl overflow-hidden rounded-2xl border-border shadow-sm">
@@ -70,15 +66,36 @@ export const GeneratingScreen: React.FC<GeneratingScreenProps> = ({
               </CardDescription>
             </CardHeader>
             <CardContent className="px-6 pt-2 pb-8 space-y-6">
-              <section aria-labelledby="topic-label" className="space-y-2">
-                <Label
-                  id="topic-label"
-                  htmlFor="topic-context"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Video topic / visual context{' '}
-                  <span className="font-normal text-muted-foreground">(optional)</span>
+              <section aria-labelledby="topic-label" className="space-y-3">
+                <Label id="topic-label" htmlFor="topic-context" className="text-sm font-medium text-foreground">
+                  Video topic / visual context <span className="font-normal text-muted-foreground">(optional)</span>
                 </Label>
+                <p className="text-xs text-muted-foreground">Pick a template or type your own. Leave empty for a generic style.</p>
+                <div className="flex flex-wrap gap-2">
+                  {TOPIC_TEMPLATES.map((tpl) => (
+                    <Button
+                      key={tpl.label}
+                      type="button"
+                      variant={topicContext === tpl.value ? 'secondary' : 'outline'}
+                      size="sm"
+                      onClick={() => onTopicContextChange(tpl.value)}
+                      className="rounded-lg text-xs"
+                      aria-pressed={topicContext === tpl.value}
+                    >
+                      {tpl.label}
+                    </Button>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onTopicContextChange('')}
+                    className="rounded-lg text-xs text-muted-foreground"
+                    aria-pressed={!topicContext}
+                  >
+                    Clear
+                  </Button>
+                </div>
                 <Textarea
                   id="topic-context"
                   value={topicContext}
@@ -88,8 +105,12 @@ export const GeneratingScreen: React.FC<GeneratingScreenProps> = ({
                       ? 'e.g. Visuals about space exploration, planets and stars.'
                       : 'e.g. This video explains Quantum Tunneling. I want particles passing through barriers…'
                   }
-                  className="w-full min-h-28 resize-none rounded-xl border-border"
+                  className="w-full min-h-24 resize-none rounded-xl border-border"
+                  aria-describedby="topic-hint"
                 />
+                <p id="topic-hint" className="text-[11px] text-muted-foreground">
+                  This helps the AI match visuals to your content. You can also leave it blank.
+                </p>
               </section>
 
               <section aria-label="Actions" className="space-y-4">
@@ -99,15 +120,17 @@ export const GeneratingScreen: React.FC<GeneratingScreenProps> = ({
                   disabled={isGenerating}
                   className="w-full h-12 rounded-xl gap-2 font-semibold"
                   size="lg"
+                  aria-busy={isGenerating}
+                  aria-live="polite"
                 >
                   {isGenerating ? (
                     <>
-                      <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
+                      <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" aria-hidden />
                       Generating scene…
                     </>
                   ) : (
                     <>
-                      <Edit3 className="size-5 shrink-0" />
+                      <Edit3 className="size-5 shrink-0" aria-hidden />
                       {primaryLabel}
                     </>
                   )}

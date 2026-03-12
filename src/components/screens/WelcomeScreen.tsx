@@ -241,22 +241,27 @@ function WelcomeFeatures() {
 interface WelcomeCtaProps {
   onLaunch: () => void;
   isValidating: boolean;
+  hasApiKey: boolean;
 }
 
-function WelcomeCta({ onLaunch, isValidating }: WelcomeCtaProps) {
+function WelcomeCta({ onLaunch, isValidating, hasApiKey }: WelcomeCtaProps) {
   return (
-    <section className="text-center space-y-4">
-      <h2 className="text-xl md:text-2xl font-bold text-foreground">Ready to Create?</h2>
-      <p className="text-muted-foreground">Upload your video & subtitles to get started!</p>
+    <section className="text-center space-y-4" aria-label="Get started">
+      <h2 className="text-xl md:text-2xl font-bold text-foreground">Ready to create?</h2>
+      <p className="text-muted-foreground">Upload your video and subtitles to get started.</p>
       <Button
         variant="gradient"
         onClick={onLaunch}
         disabled={isValidating}
         size="lg"
         className="h-12 md:h-14 px-8 md:px-12 rounded-2xl text-base font-bold"
+        aria-busy={isValidating}
       >
-        {isValidating ? 'Verifying...' : 'Launch Editor'}
+        {isValidating ? 'Verifying…' : 'Launch Editor'}
       </Button>
+      {!hasApiKey && !isValidating && (
+        <p className="text-xs text-muted-foreground">Enter your API key above, or use manual mode to skip.</p>
+      )}
     </section>
   );
 }
@@ -318,7 +323,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
         />
         <WelcomeSteps />
         <WelcomeFeatures />
-        <WelcomeCta onLaunch={handleValidation} isValidating={isValidating} />
+        <WelcomeCta onLaunch={handleValidation} isValidating={isValidating} hasApiKey={!!apiKey.trim()} />
       </main>
       <div className="mt-14">
         <AppFooter />

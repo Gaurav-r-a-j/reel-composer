@@ -2,9 +2,20 @@ import React from 'react';
 import { BookOpen, Github, Globe, Linkedin, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export const AppFooter: React.FC = () => {
+interface AppFooterProps {
+  /** When true, footer is fixed to bottom of viewport with a reveal effect on scroll */
+  reveal?: boolean;
+}
+
+export const AppFooter: React.FC<AppFooterProps> = ({ reveal }) => {
   return (
-    <footer className="border-t border-border bg-muted w-full shrink-0">
+    <footer
+      className={
+        reveal
+          ? 'fixed bottom-0 left-0 right-0 z-40 w-full border-t border-border bg-muted/95 backdrop-blur-sm shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.4)]'
+          : 'border-t border-border bg-muted w-full shrink-0'
+      }
+    >
       <div className="container flex flex-col md:flex-row items-center justify-between gap-6 py-8">
         <div className="flex items-center gap-6">
           <div className="size-14 rounded-full bg-gradient-to-br from-primary to-secondary p-[2px] shrink-0">

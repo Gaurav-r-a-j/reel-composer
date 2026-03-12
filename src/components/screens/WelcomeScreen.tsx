@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   AlertTriangle,
   Code2,
@@ -20,11 +20,11 @@ import { AppFooter } from '@/components/layout/AppFooter';
 
 const GRID_BG_STYLE = {
   backgroundImage:
-    'repeating-linear-gradient(to right, rgba(148,163,184,0.2) 0, rgba(148,163,184,0.2) 1px, transparent 1px, transparent 24px), repeating-linear-gradient(to bottom, rgba(148,163,184,0.18) 0, rgba(148,163,184,0.18) 1px, transparent 1px, transparent 24px)',
+    'repeating-linear-gradient(to right, rgba(148,163,184,0.1) 0, rgba(148,163,184,0.1) 1px, transparent 1px, transparent 24px), repeating-linear-gradient(to bottom, rgba(148,163,184,0.08) 0, rgba(148,163,184,0.08) 1px, transparent 1px, transparent 24px)',
   maskImage:
-    'linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 25%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%)',
+    'linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0) 100%)',
   WebkitMaskImage:
-    'linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 25%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%)',
+    'linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0) 100%)',
 };
 
 function WelcomeGridBg() {
@@ -79,6 +79,7 @@ interface GeminiSetupCardProps {
   onManualMode: () => void;
   isValidating: boolean;
   error: string | null;
+  sectionRef?: React.RefObject<HTMLElement | null>;
 }
 
 function GeminiSetupCard({
@@ -88,9 +89,10 @@ function GeminiSetupCard({
   onManualMode,
   isValidating,
   error,
+  sectionRef,
 }: GeminiSetupCardProps) {
   return (
-    <section className="mb-12 md:mb-14">
+    <section ref={sectionRef} className="mb-12 md:mb-14" aria-label="Set up Gemini API key">
       <Card className="rounded-2xl border-border/80 overflow-hidden">
         <CardContent className="p-6 md:p-8">
           <h2 className="text-xl md:text-2xl font-bold text-foreground">
@@ -269,12 +271,20 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
   const [error, setError] = useState<string | null>(null);
   const selectedModel = APP_CONFIG.DEFAULT_MODEL;
 
+  const geminiSectionRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     const storedKey = localStorage.getItem('gemini_api_key');
     const defaultKey = APP_CONFIG.DEFAULT_API_KEY || '';
     if (storedKey) setApiKey(storedKey);
     else if (defaultKey) setApiKey(defaultKey);
   }, []);
+
+  useEffect(() => {
+    if (error) {
+      geminiSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [error]);
 
   const handleValidation = async () => {
     if (!apiKey.trim()) {
@@ -295,9 +305,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
     <div className="min-h-screen bg-background relative text-foreground">
       <WelcomeGridBg />
       <WelcomeHeader />
-      <main className="relative z-10 container max-w-4xl mx-auto px-4 pb-20 z-[1]">
+      <main className="relative z-10 container max-w-4xl mx-auto px-4 pb-20">
         <WelcomeHero />
         <GeminiSetupCard
+          sectionRef={geminiSectionRef}
           apiKey={apiKey}
           onApiKeyChange={setApiKey}
           onValidate={handleValidation}
@@ -308,9 +319,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
         <WelcomeSteps />
         <WelcomeFeatures />
         <WelcomeCta onLaunch={handleValidation} isValidating={isValidating} />
-
       </main>
-      <div className="sticky z-[1] bottom-0 w-full">
+      <div className="mt-14">
         <AppFooter />
       </div>
     </div>

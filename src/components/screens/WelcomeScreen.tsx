@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { ModeToggle } from '@/components/layout/ModeToggle';
+import { AppFooter } from '@/components/layout/AppFooter';
 
 const GRID_BG_STYLE = {
   backgroundImage:
@@ -90,7 +91,7 @@ function GeminiSetupCard({
 }: GeminiSetupCardProps) {
   return (
     <section className="mb-12 md:mb-14">
-      <Card className="rounded-2xl shadow-md border-border/80 overflow-hidden">
+      <Card className="rounded-2xl border-border/80 overflow-hidden">
         <CardContent className="p-6 md:p-8">
           <h2 className="text-xl md:text-2xl font-bold text-foreground">
             Set Up Your{' '}
@@ -136,9 +137,10 @@ function GeminiSetupCard({
           </div>
           <div className="mt-5 space-y-3">
             <Button
+              variant="gradient"
               onClick={onValidate}
               disabled={isValidating}
-              className="w-full h-11 rounded-xl bg-[linear-gradient(90deg,#8B5CF6,#3B82F6)] hover:opacity-90 text-white font-semibold shadow-md"
+              className="w-full h-11 rounded-xl"
             >
               {isValidating ? (
                 <span className="flex items-center gap-2">
@@ -155,13 +157,9 @@ function GeminiSetupCard({
               </div>
             )}
             <p className="text-center text-xs text-muted-foreground">
-              <button
-                type="button"
-                onClick={onManualMode}
-                className="text-primary font-medium hover:underline"
-              >
+              <Button variant="link" type="button" onClick={onManualMode} className="text-xs h-auto p-0">
                 Launch in manual mode (no AI)
-              </button>
+              </Button>
             </p>
           </div>
         </CardContent>
@@ -173,7 +171,7 @@ function GeminiSetupCard({
 function WelcomeSteps() {
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 md:mb-14">
-      <Card className="text-center rounded-2xl shadow-md border-border/80 overflow-hidden">
+      <Card className="text-center rounded-2xl border-border/80 overflow-hidden">
         <CardContent className="pt-6 pb-5 px-5">
           <div className="mx-auto mb-3 size-12 rounded-xl bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] flex items-center justify-center shadow-md">
             <Upload className="size-6 text-white" />
@@ -182,7 +180,7 @@ function WelcomeSteps() {
           <p className="mt-1 text-sm text-muted-foreground">Add your video & subtitles</p>
         </CardContent>
       </Card>
-      <Card className="text-center rounded-2xl shadow-md border-border/80 overflow-hidden">
+      <Card className="text-center rounded-2xl border-border/80 overflow-hidden">
         <CardContent className="pt-6 pb-5 px-5">
           <div className="mx-auto mb-3 size-12 rounded-xl bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] flex items-center justify-center shadow-md">
             <Sparkles className="size-6 text-white" />
@@ -191,7 +189,7 @@ function WelcomeSteps() {
           <p className="mt-1 text-sm text-muted-foreground">Gemini creates dynamic visuals</p>
         </CardContent>
       </Card>
-      <Card className="text-center rounded-2xl shadow-md border-border/80 overflow-hidden">
+      <Card className="text-center rounded-2xl border-border/80 overflow-hidden">
         <CardContent className="pt-6 pb-5 px-5">
           <div className="mx-auto mb-3 size-12 rounded-xl bg-[linear-gradient(135deg,#3B82F6,#60A5FA)] flex items-center justify-center shadow-md">
             <Download className="size-6 text-white" />
@@ -207,7 +205,7 @@ function WelcomeSteps() {
 function WelcomeFeatures() {
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 md:mb-14">
-      <Card className="rounded-2xl shadow-md border-border/80 overflow-hidden">
+      <Card className="rounded-2xl border-border/80 overflow-hidden">
         <CardContent className="p-5">
           <div className="size-10 rounded-xl bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] flex items-center justify-center mb-3">
             <Sparkles className="size-5 text-white" />
@@ -216,7 +214,7 @@ function WelcomeFeatures() {
           <p className="mt-1 text-sm text-muted-foreground">Smart visuals from your script</p>
         </CardContent>
       </Card>
-      <Card className="rounded-2xl shadow-md border-border/80 overflow-hidden">
+      <Card className="rounded-2xl border-border/80 overflow-hidden">
         <CardContent className="p-5">
           <div className="size-10 rounded-xl bg-[linear-gradient(135deg,#0D9488,#2DD4BF)] flex items-center justify-center mb-3">
             <Code2 className="size-5 text-white" />
@@ -225,7 +223,7 @@ function WelcomeFeatures() {
           <p className="mt-1 text-sm text-muted-foreground">Perfect for coding & design videos</p>
         </CardContent>
       </Card>
-      <Card className="rounded-2xl shadow-md border-border/80 overflow-hidden">
+      <Card className="rounded-2xl border-border/80 overflow-hidden">
         <CardContent className="p-5">
           <div className="size-10 rounded-xl bg-[linear-gradient(135deg,#3B82F6,#60A5FA)] flex items-center justify-center mb-3">
             <Zap className="size-5 text-white" />
@@ -249,27 +247,15 @@ function WelcomeCta({ onLaunch, isValidating }: WelcomeCtaProps) {
       <h2 className="text-xl md:text-2xl font-bold text-foreground">Ready to Create?</h2>
       <p className="text-muted-foreground">Upload your video & subtitles to get started!</p>
       <Button
+        variant="gradient"
         onClick={onLaunch}
         disabled={isValidating}
         size="lg"
-        className="h-12 md:h-14 px-8 md:px-12 rounded-2xl text-base font-bold bg-[linear-gradient(90deg,#8B5CF6,#3B82F6)] hover:opacity-90 text-white shadow-lg"
+        className="h-12 md:h-14 px-8 md:px-12 rounded-2xl text-base font-bold"
       >
         {isValidating ? 'Verifying...' : 'Launch Editor'}
       </Button>
     </section>
-  );
-}
-
-function WelcomeFooter() {
-  return (
-    <footer className="mt-14 pt-6 border-t border-border/60 text-center">
-      <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5">
-        <span className="size-5 rounded bg-muted flex items-center justify-center font-mono text-[10px] font-bold">
-          P
-        </span>
-        Plus Jakarta Sans
-      </p>
-    </footer>
   );
 }
 
@@ -309,7 +295,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
     <div className="min-h-screen bg-background relative text-foreground">
       <WelcomeGridBg />
       <WelcomeHeader />
-      <main className="relative z-10 container max-w-4xl mx-auto px-4 pb-20">
+      <main className="relative z-10 container max-w-4xl mx-auto px-4 pb-20 z-[1]">
         <WelcomeHero />
         <GeminiSetupCard
           apiKey={apiKey}
@@ -322,8 +308,11 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
         <WelcomeSteps />
         <WelcomeFeatures />
         <WelcomeCta onLaunch={handleValidation} isValidating={isValidating} />
-        <WelcomeFooter />
+
       </main>
+      <div className="sticky z-[1] bottom-0 w-full">
+        <AppFooter />
+      </div>
     </div>
   );
 };

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, FileVideo, FileText, ArrowRight, Download, ExternalLink, Music, Wand2, Mic, Play, FileAudio, Disc, Video, Clapperboard, Sparkles, CheckSquare, Edit2, Save, X, Headphones, Trash2, ArrowLeft, BookOpen, Globe, Github, Linkedin, Instagram, Facebook } from 'lucide-react';
+import { Upload, FileVideo, FileText, ArrowRight, Download, ExternalLink, Music, Wand2, Mic, Play, FileAudio, Disc, Video, Clapperboard, Sparkles, CheckSquare, Edit2, Save, X, Headphones, Trash2, ArrowLeft } from 'lucide-react';
 import { extractWavFromVideo } from '@/utils/audioHelpers';
 import { generateSRT, generateTTS } from '@/services/geminiService';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ModeToggle } from '@/components/layout/ModeToggle';
+import { AppFooter } from '@/components/layout/AppFooter';
 
 interface FileUploadProps {
   onFilesSelected: (videoFile: File, srtFile: File, isAudioOnly: boolean) => void;
@@ -573,50 +574,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
           </div>
       </div>
 
-      {/* Footer - Fixed Bottom */}
-      <div className="border-t border-border bg-muted w-full shrink-0 z-20">
-            <div className="container flex flex-col md:flex-row items-center justify-between gap-6 py-8">
-              <div className="flex items-center gap-6">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary p-[2px]">
-                  <a href="https://prasannathapa.in" target="_blank">
-                  <img src="https://blog.prasannathapa.in/content/images/2024/12/Picsart_24-12-18_08-13-50-070.jpg" alt="Prasanna Thapa" className="rounded-full w-full h-full object-cover bg-background" />
-                  </a>
-                </div>
-                <div>
-                  <div className="font-bold text-foreground text-lg">Prasanna Thapa</div>
-                  <div className="text-s text-muted-foreground flex items-center gap-1.5">
-                    Technical Architect
-                    <div className="hidden md:block w-px h-4 bg-border"></div>
-                    <a href="https://zoho.com" target="_blank">
-                    <img src="https://www.zohowebstatic.com/sites/default/files/zoho_general_pages/zoho-logo-white.png" alt="Zoho" className="h-5" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap justify-center gap-4 items-center">
-                <a href="https://blog.prasannathapa.in/reel-composer/" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary hover:bg-primary/40 hover:text-primary-foreground transition-colors text-sm font-medium border border-primary/30">
-                  <BookOpen size={14} /> The Philosophy
-                </a>
-                <a href="https://github.com/prasannathapa/reel-composer" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors text-sm font-medium border border-border">
-                  <Github size={14} /> Source Code
-                </a>
-                <div className="hidden md:block w-px h-4 bg-border"></div>
-                <a href="https://prasannathapa.in/" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary transition-colors" title="Website">
-                <Globe size={20} />
-                </a>
-                <a href="https://github.com/prasannathapa" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground transition-colors" title="GitHub">
-                <Github size={20} />
-                </a>
-                <a href="https://www.linkedin.com/in/prasannathapa" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary transition-colors" title="LinkedIn">
-                <Linkedin size={20} />
-                </a>
-                <a href="https://instagram.com/prasanna_thapa" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary transition-colors" title="Instagram">
-                <Instagram size={20} />
-                </a>
-              </div>
-            </div>
-          </div>
+      <AppFooter />
     </div>
   );
 };

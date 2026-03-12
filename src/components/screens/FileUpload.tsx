@@ -245,26 +245,28 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                     
                     {currentSrt ? (
                     <div className="flex-1 flex flex-col items-center justify-center p-6 relative w-full">
-                        <button
+                        <Button
                             type="button"
+                            variant="outline"
+                            size="icon-xs"
                             onClick={handleRemoveSrt}
-                            className="absolute top-2 right-2 p-1.5 bg-surface-elevated hover:bg-danger-muted hover:text-danger rounded-lg text-ink-muted transition-colors z-20 border border-edge"
+                            className="absolute top-2 right-2 z-20"
                             title="Remove Captions"
                         >
                             <X size={14} />
-                        </button>
+                        </Button>
                         <div className="p-3 rounded-full bg-success text-white mb-2 shadow">
                             <CheckSquare size={24} />
                         </div>
                         <p className="font-semibold text-ink text-sm max-w-[80%] truncate mb-1">{currentSrt.name}</p>
                         <p className="text-xs text-success font-mono mb-4">{(currentSrt.size / 1024).toFixed(1)} KB</p>
                         <div className="flex gap-2 z-10">
-                            <button type="button" onClick={() => setIsEditingSrt(true)} className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-elevated hover:bg-edge border border-edge rounded-lg text-xs text-ink transition-colors">
+                            <Button type="button" variant="outline" size="sm" onClick={() => setIsEditingSrt(true)}>
                                 <Edit2 size={12} /> Edit
-                            </button>
-                            <button type="button" onClick={handleDownloadSrt} className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-elevated hover:bg-edge border border-edge rounded-lg text-xs text-ink transition-colors">
+                            </Button>
+                            <Button type="button" variant="outline" size="sm" onClick={handleDownloadSrt}>
                                 <Download size={12} /> Download
-                            </button>
+                            </Button>
                         </div>
                     </div>
                     ) : (
@@ -272,41 +274,40 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                             <p className="text-ink-muted text-sm">Add Captions</p>
                             <div className="grid grid-cols-1 gap-2 w-full max-w-xs">
                                 <div className="flex gap-2 w-full">
-                                    <button
+                                    <Button
                                         type="button"
+                                        variant="default"
+                                        size="sm"
                                         onClick={handleAutoGenerateSRT}
                                         disabled={!hasSource || isAutoGeneratingSRT}
-                                        className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border font-semibold text-sm transition-all ${
-                                            !hasSource
-                                                ? 'border-edge text-ink-subtle cursor-not-allowed bg-surface-elevated'
-                                                : 'border-accent bg-accent-muted text-accent hover:bg-accent hover:text-white'
-                                        }`}
+                                        className="flex-1"
                                     >
                                         {isAutoGeneratingSRT ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <Wand2 size={16} />}
                                         {isAutoGeneratingSRT ? "Generating..." : "Auto-Generate (AI)"}
-                                    </button>
+                                    </Button>
                                     {isAutoGeneratingSRT && (
-                                        <button
+                                        <Button
                                             type="button"
+                                            variant="destructive"
+                                            size="icon"
                                             onClick={handleCancelGeneration}
-                                            className="p-3 rounded-xl border border-danger bg-danger-muted text-danger hover:bg-danger hover:text-white transition-colors"
                                             title="Cancel Generation"
                                         >
                                             <X size={16} />
-                                        </button>
+                                        </Button>
                                     )}
                                 </div>
                                 {!isTTSMode && (
-                                    <label
-                                        htmlFor="srt-upload"
-                                        className={`flex items-center justify-center gap-2 p-3 rounded-xl border border-edge bg-surface-elevated text-ink-muted transition-colors font-medium text-sm ${
-                                            isAutoGeneratingSRT
-                                                ? 'opacity-50 cursor-not-allowed pointer-events-none'
-                                                : 'hover:bg-edge hover:text-ink cursor-pointer'
-                                        }`}
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={isAutoGeneratingSRT}
+                                        className="w-full"
+                                        onClick={() => document.getElementById('srt-upload')?.click()}
                                     >
                                         <Upload size={16} /> Upload .SRT
-                                    </label>
+                                    </Button>
                                 )}
                             </div>
                         </div>
@@ -321,10 +322,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                     <Textarea
                         value={srtContent}
                         onChange={(e) => setSrtContent(e.target.value)}
-                        className="flex-1 w-full min-h-0 font-mono text-xs rounded-none border-0 resize-none"
+                        className="flex-1 w-full min-h-0 resize-none"
                         spellCheck={false}
                     />
-                    <Button type="button" onClick={handleSrtSave} className="w-full rounded-none">
+                    <Button type="button" onClick={handleSrtSave} className="w-full">
                         <Save size={12} /> Save Changes
                     </Button>
                 </div>
@@ -347,26 +348,26 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
             </div>
 
             <div className="flex border-b border-edge w-full max-w-md mx-auto mb-2">
-                <button
+                <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setActiveTab('video')}
-                    className={`flex-1 pb-3 pt-1 text-sm font-semibold text-center transition-colors relative rounded-t-lg ${
-                        activeTab === 'video' ? 'text-ink' : 'text-ink-muted hover:text-ink'
-                    }`}
+                    className="flex-1 relative rounded-t-lg"
                 >
                     Video Studio
-                    {activeTab === 'video' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-accent rounded-t-full" />}
-                </button>
-                <button
+                    {activeTab === 'video' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />}
+                </Button>
+                <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setActiveTab('audio')}
-                    className={`flex-1 pb-3 pt-1 text-sm font-semibold text-center transition-colors relative rounded-t-lg ${
-                        activeTab === 'audio' ? 'text-ink' : 'text-ink-muted hover:text-ink'
-                    }`}
+                    className="flex-1 relative rounded-t-lg"
                 >
                     Audio Visualizer
-                    {activeTab === 'audio' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-accent-secondary rounded-t-full" />}
-                </button>
+                    {activeTab === 'audio' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />}
+                </Button>
             </div>
 
             <div className="w-full bg-surface/60 border border-edge rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-lg">
@@ -382,14 +383,16 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                         
                         {videoFile ? (
                             <div className="relative w-full h-full flex flex-col items-center justify-center z-10">
-                                <button
+                                <Button
                                     type="button"
+                                    variant="outline"
+                                    size="icon-sm"
                                     onClick={handleRemoveVideo}
-                                    className="absolute top-2 right-2 p-2 bg-surface-elevated hover:bg-danger-muted hover:text-danger rounded-lg text-ink-muted transition-colors shadow border border-edge"
+                                    className="absolute top-2 right-2"
                                     title="Remove Video"
                                 >
                                     <X size={16} />
-                                </button>
+                                </Button>
 
                                 <div className="p-4 rounded-full bg-accent text-white mb-4">
                                     <FileVideo size={32} />
@@ -399,9 +402,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                     <p className="text-xs text-ink-subtle mt-1">{(videoFile.size / (1024*1024)).toFixed(1)} MB</p>
                                 </div>
 
-                                <button type="button" onClick={handleExtractAudio} disabled={isExtracting} className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 bg-surface/90 hover:bg-surface-elevated backdrop-blur text-xs text-ink-muted px-3 py-1.5 rounded-lg border border-edge transition-colors">
+                                <Button type="button" variant="outline" size="sm" onClick={handleExtractAudio} disabled={isExtracting} className="absolute bottom-4 right-4 z-20">
                                     {isExtracting ? <span className="animate-pulse">Processing...</span> : <><Download size={12}/> Get WAV</>}
-                                </button>
+                                </Button>
                             </div>
                         ) : (
                             <label htmlFor="video-upload" className="cursor-pointer flex flex-col items-center space-y-4 w-full h-full justify-center z-10">
@@ -428,9 +431,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                 // --- AUDIO / TTS MODE ---
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
                     <div className="space-y-4">
-                        <div className="flex bg-surface-elevated p-1 rounded-lg w-fit border border-edge">
-                            <button type="button" onClick={() => setAudioSourceType('upload')} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${audioSourceType === 'upload' ? 'bg-edge text-ink shadow' : 'text-ink-muted hover:text-ink'}`}>Upload File</button>
-                            <button type="button" onClick={() => setAudioSourceType('tts')} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${audioSourceType === 'tts' ? 'bg-edge text-ink shadow' : 'text-ink-muted hover:text-ink'}`}>Text to Speech</button>
+                        <div className="flex p-1 rounded-lg w-fit border border-edge bg-muted/30">
+                            <Button type="button" variant={audioSourceType === 'upload' ? 'secondary' : 'ghost'} size="sm" onClick={() => setAudioSourceType('upload')}>
+                                Upload File
+                            </Button>
+                            <Button type="button" variant={audioSourceType === 'tts' ? 'secondary' : 'ghost'} size="sm" onClick={() => setAudioSourceType('tts')}>
+                                Text to Speech
+                            </Button>
                         </div>
 
                         {audioSourceType === 'upload' ? (
@@ -439,13 +446,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                 
                                 {audioFile ? (
                                     <>
-                                        <button
+                                        <Button
                                             type="button"
+                                            variant="outline"
+                                            size="icon-xs"
                                             onClick={handleRemoveAudio}
-                                            className="absolute top-2 right-2 p-1.5 bg-surface-elevated hover:bg-danger-muted hover:text-danger rounded-lg text-ink-muted transition-colors border border-edge z-20"
+                                            className="absolute top-2 right-2 z-20"
                                         >
                                             <X size={14} />
-                                        </button>
+                                        </Button>
                                         <label htmlFor="audio-upload" className="cursor-pointer flex flex-col items-center space-y-3 w-full h-full justify-center z-10">
                                             <div className="p-4 rounded-full bg-accent-secondary text-white">
                                                 <Music size={28} />
@@ -471,14 +480,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                         ) : (
                             <div className="h-60 flex flex-col gap-3">
                                 <div className="flex gap-2">
-                                    <button onClick={() => setTtsVoice('male')} className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-all ${ttsVoice === 'male' ? 'bg-blue-600/20 border-blue-500 text-blue-300' : 'bg-black/40 border-gray-700 text-gray-400 hover:border-gray-600'}`}>Male</button>
-                                    <button onClick={() => setTtsVoice('female')} className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-all ${ttsVoice === 'female' ? 'bg-pink-600/20 border-pink-500 text-pink-300' : 'bg-black/40 border-gray-700 text-gray-400 hover:border-gray-600'}`}>Female</button>
+                                    <Button variant={ttsVoice === 'male' ? 'secondary' : 'outline'} size="sm" onClick={() => setTtsVoice('male')} className="flex-1">
+                                        Male
+                                    </Button>
+                                    <Button variant={ttsVoice === 'female' ? 'secondary' : 'outline'} size="sm" onClick={() => setTtsVoice('female')} className="flex-1">
+                                        Female
+                                    </Button>
                                 </div>
                                 <Textarea
                                     value={ttsScript}
                                     onChange={(e) => setTtsScript(e.target.value)}
                                     placeholder="Type script here..."
-                                    className="flex-1 min-h-0 w-full resize-none text-xs"
+                                    className="flex-1 min-h-0 w-full resize-none"
                                 />
                                 <Button onClick={handleGenerateTTS} disabled={isGeneratingAudio || !ttsScript || !apiKey} className="w-full">
                                     {isGeneratingAudio ? "Synthesizing..." : "Generate Audio (AI)"}
@@ -496,9 +509,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                     <p className="text-xs font-bold text-white truncate">{(generatedAudioFile || audioFile)?.name}</p>
                                     <audio controls src={URL.createObjectURL(generatedAudioFile || audioFile!)} className="w-full h-6 mt-1 opacity-70 hover:opacity-100" />
                                 </div>
-                                <button onClick={handleDownloadAudio} className="p-2 hover:bg-gray-700 rounded-lg text-gray-400 hover:text-white" title="Download Audio">
+                                <Button variant="ghost" size="icon-sm" onClick={handleDownloadAudio} title="Download Audio">
                                     <Download size={16}/>
-                                </button>
+                                </Button>
                                 
                                 {/* Remove button for generated audio context specifically if needed, though handled in main view above */}
                             </div>

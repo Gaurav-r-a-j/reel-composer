@@ -10,7 +10,8 @@ interface AppHeaderProps {
 
 export const AppHeader: React.FC<AppHeaderProps> = ({ onResetAuth, onNewProject }) => {
   return (
-    <header className="h-14 border-b border-border flex items-center justify-between px-5 bg-background/80 backdrop-blur-md z-10 shrink-0">
+    <header className="h-14 border-b border-border flex items-center bg-background/80 backdrop-blur-md z-10 shrink-0">
+      <div className="container flex items-center justify-between h-full">
       <div className="font-bold text-lg bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
         Reel Composer
       </div>
@@ -27,6 +28,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onResetAuth, onNewProject 
         </Button>
         <div className="w-px h-4 bg-border" aria-hidden />
         <span className="text-[10px] uppercase tracking-widest text-primary font-medium">v1.3</span>
+      </div>
       </div>
     </header>
   );

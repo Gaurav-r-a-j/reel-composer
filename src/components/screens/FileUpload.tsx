@@ -4,6 +4,7 @@ import { extractWavFromVideo } from '@/utils/audioHelpers';
 import { generateSRT, generateTTS } from '@/services/geminiService';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { ModeToggle } from '@/components/layout/ModeToggle';
 
 interface FileUploadProps {
   onFilesSelected: (videoFile: File, srtFile: File, isAudioOnly: boolean) => void;
@@ -336,24 +337,27 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
 
   return (
     <div className="flex flex-col h-full w-full animate-fade-in relative bg-background">
-      <div className="flex-1 flex flex-col items-center justify-center p-6 w-full overflow-y-auto">
-          <div className="w-full max-w-5xl space-y-6 my-auto">
-            <div className="text-center space-y-2 mb-6">
-                <h1 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary tracking-tight leading-tight">
-                  Reel Composer
-                </h1>
-                <p className="text-muted-foreground text-base md:text-lg">
-                  Create viral shorts from any media source.
-                </p>
-            </div>
+      <div className="absolute top-4 right-4 z-100">
+        <ModeToggle />
+      </div>
+      <div className="flex-1 flex flex-col w-full overflow-y-auto">
+          <div className="container space-y-6 my-auto py-6">
+            <section className="text-center space-y-2 pb-4" aria-label="Title">
+              <h1 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary tracking-tight leading-tight text-foreground">
+                Reel Composer
+              </h1>
+              <p className="text-muted-foreground text-base md:text-lg">
+                Create viral shorts from any media source.
+              </p>
+            </section>
 
-            <div className="flex border-b border-border w-full max-w-md mx-auto mb-2">
+            <div className="flex w-full max-w-md mx-auto rounded-full bg-muted/40 p-1 shadow-sm">
                 <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     onClick={() => setActiveTab('video')}
-                    className="flex-1 relative rounded-t-lg"
+                    className="flex-1 relative rounded-t-lg gap-2 py-2.5"
                 >
                     Video Studio
                     {activeTab === 'video' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />}
@@ -363,19 +367,19 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                     variant="ghost"
                     size="sm"
                     onClick={() => setActiveTab('audio')}
-                    className="flex-1 relative rounded-t-lg"
+                    className="flex-1 relative rounded-t-lg gap-2 py-2.5"
                 >
                     Audio Visualizer
                     {activeTab === 'audio' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />}
                 </Button>
             </div>
 
-            <div className="w-full bg-card/60 border border-border rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-lg">
+            <div className="w-full bg-card rounded-2xl overflow-hidden shadow-sm">
                 {activeTab === 'video' ? (
                 // --- VIDEO UPLOAD MODE ---
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-                    <div className="space-y-3">
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2">
+                    <section className="p-6 md:p-6 space-y-3" aria-labelledby="source-heading">
+                    <h3 id="source-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
                         <Clapperboard size={14} /> Source Footage
                     </h3>
                     <div className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center transition-all h-64 relative overflow-hidden group ${videoFile ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50 bg-muted'}`}>
@@ -418,19 +422,22 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                             </label>
                         )}
                     </div>
-                    </div>
+                    </section>
 
-                    <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                    <section className="p-6 md:p-6 space-y-3 border-t border-border md:border-t-0 md:border-l" aria-labelledby="subtitles-heading">
+                    <h3 id="subtitles-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
                         <FileText size={14}/> Subtitles
                     </h3>
                     {renderSRTSection()}
-                    </div>
+                    </section>
                 </div>
                 ) : (
                 // --- AUDIO / TTS MODE ---
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-                    <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2">
+                    <section className="p-6 md:p-6 space-y-4" aria-labelledby="audio-source-heading">
+                        <h3 id="audio-source-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+                            <Music size={14} /> Audio Source
+                        </h3>
                         <div className="flex p-1 rounded-lg w-fit border border-border bg-muted/30">
                             <Button type="button" variant={audioSourceType === 'upload' ? 'secondary' : 'ghost'} size="sm" onClick={() => setAudioSourceType('upload')}>
                                 Upload File
@@ -516,20 +523,20 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                 {/* Remove button for generated audio context specifically if needed, though handled in main view above */}
                             </div>
                         )}
-                    </div>
+                    </section>
 
-                    <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                    <section className="p-6 md:p-6 space-y-3 border-t border-border md:border-t-0 md:border-l" aria-labelledby="audio-subtitles-heading">
+                    <h3 id="audio-subtitles-heading" className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
                         <FileText size={14}/> Subtitles
                     </h3>
                     {renderSRTSection()}
-                    </div>
+                    </section>
                 </div>
                 )}
             </div>
 
             <div className="flex justify-center w-full">
-                <div className="flex items-center gap-4 w-full max-w-md">
+                <div className="flex items-center gap-4 w-full max-w-md mx-auto">
                     {/* BACK BUTTON */}
                     <Button
                         type="button"
@@ -547,9 +554,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                         onClick={handleNext}
                         disabled={activeTab === 'video' ? (!videoFile || !currentSrt) : (!(generatedAudioFile || audioFile) || !currentSrt)}
                         className="flex-1 h-16 rounded-full gap-3 text-lg font-black"
+                        size="lg"
                     >
                         {activeTab === 'video' ? 'Enter Studio' : 'Compose Visualizer'}
-                        <ArrowRight size={24} />
+                        <ArrowRight size={24} className="shrink-0" />
                     </Button>
                 </div>
             </div>
@@ -566,8 +574,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
       </div>
 
       {/* Footer - Fixed Bottom */}
-      <div className="border-t border-border bg-muted p-8 w-full shrink-0 z-20">
-            <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="border-t border-border bg-muted w-full shrink-0 z-20">
+            <div className="container flex flex-col md:flex-row items-center justify-between gap-6 py-8">
               <div className="flex items-center gap-6">
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary p-[2px]">
                   <a href="https://prasannathapa.in" target="_blank">
@@ -575,7 +583,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                   </a>
                 </div>
                 <div>
-                  <div className="font-bold text-foreground text-base text-xl">Prasanna Thapa</div>
+                  <div className="font-bold text-foreground text-lg">Prasanna Thapa</div>
                   <div className="text-s text-muted-foreground flex items-center gap-1.5">
                     Technical Architect
                     <div className="hidden md:block w-px h-4 bg-border"></div>

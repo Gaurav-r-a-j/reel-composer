@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, FileVideo, FileText, ArrowRight, Download, ExternalLink, Music, Play, Clapperboard, Sparkles, CheckSquare, Edit2, Save, X, Trash2, ArrowLeft } from 'lucide-react';
+import { Upload, FileVideo, FileText, ArrowRight, Download, ExternalLink, Music, Play, Clapperboard, Sparkles, CheckSquare, Edit2, Save, X, Trash2, ArrowLeft, History, FolderOpen } from 'lucide-react';
 import { extractWavFromVideo } from '@/utils/audioHelpers';
 import { generateSRT, generateTTS } from '@/services/geminiService';
 import { Button } from '@/components/ui/button';
@@ -8,14 +8,20 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { ModeToggle } from '@/components/layout/ModeToggle';
 import { AppFooter } from '@/components/layout/AppFooter';
+import type { DraftListItem } from '@/lib/draftStorage';
 
 interface FileUploadProps {
   onFilesSelected: (videoFile: File, srtFile: File, isAudioOnly: boolean) => void;
   apiKey: string;
   onBack: () => void;
+  listDrafts?: () => Promise<DraftListItem[]>;
+  onOpenDraft?: (code: string) => void;
+  onDeleteDraft?: (code: string) => Promise<void>;
+  /** Called to show an error message (e.g. toast/snackbar) instead of alert(). */
+  onError?: (message: string) => void;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey, onBack }) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey, onBack, listDrafts, onOpenDraft, onDeleteDraft, onError }) => {
   const [activeTab, setActiveTab] = useState<'video' | 'audio'>('video');
   
   // --- Split State for SRT ---
@@ -47,6 +53,27 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
 
   // --- Refs ---
   const generationActiveRef = useRef(false);
+  const srtInputRef = useRef<HTMLInputElement>(null);
+
+  // --- Draft history ---
+  const [draftList, setDraftList] = useState<DraftListItem[]>([]);
+  const [draftListLoading, setDraftListLoading] = useState(!!listDrafts);
+  useEffect(() => {
+    if (!listDrafts) return;
+    setDraftListLoading(true);
+    listDrafts()
+      .then(setDraftList)
+      .catch(() => setDraftList([]))
+      .finally(() => setDraftListLoading(false));
+  }, [listDrafts]);
+  const refreshDraftList = () => {
+    if (!listDrafts) return;
+    setDraftListLoading(true);
+    listDrafts()
+      .then(setDraftList)
+      .catch(() => setDraftList([]))
+      .finally(() => setDraftListLoading(false));
+  };
 
   // --- Effects ---
   
@@ -99,9 +126,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
   };
 
   const handleSrtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setCurrentSrt(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      setCurrentSrt(file);
     }
+    e.target.value = ''; // Reset so same file can be selected again
   };
 
   const handleExtractAudio = async (e: React.MouseEvent) => {
@@ -111,7 +140,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
     try {
       await extractWavFromVideo(videoFile);
     } catch (e) {
-      alert("Failed to extract audio.");
+      const msg = "Failed to extract audio from video.";
+      onError ? onError(msg) : alert(msg);
     } finally {
       setIsExtracting(false);
     }
@@ -125,11 +155,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
     else sourceFile = generatedAudioFile || audioFile;
 
     if (!sourceFile) {
-        alert("Please upload/generate media first.");
+        const msg = "Please upload or generate media first.";
+        onError ? onError(msg) : alert(msg);
         return;
     }
     if (!apiKey) {
-      alert("Please configure your API Key in settings first.");
+      const msg = "Configure your API key in settings first.";
+      onError ? onError(msg) : alert(msg);
       return;
     }
 
@@ -150,7 +182,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
       
       console.error(err);
       // ERROR FIX: Show the actual API error instead of generic 20MB warning
-      alert(`Auto-generation failed: ${err.message || "Unknown error occurred"}`);
+      const msg = err.message || "Auto-generation failed. Try again or upload an SRT file.";
+      onError ? onError(msg) : alert(`Auto-generation failed: ${msg}`);
     } finally {
       if (generationActiveRef.current) {
         setIsAutoGeneratingSRT(false);
@@ -188,7 +221,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
       // Note: We do NOT auto-generate SRT anymore, user must click the button.
     } catch (err) {
       console.error(err);
-      alert("Failed to generate audio. See console for details.");
+      const msg = err instanceof Error ? err.message : "Failed to generate audio. Try again.";
+      onError ? onError(msg) : alert(msg);
     } finally {
       setIsGeneratingAudio(false);
     }
@@ -234,7 +268,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
 
     return (
         <div className={`border-2 border-dashed rounded-xl transition-all min-h-[260px] relative overflow-hidden flex flex-col ${currentSrt ? 'border-primary bg-primary/5' : 'border-border bg-muted/40 hover:border-primary/30'}`}>
-            <input type="file" accept=".srt" onChange={handleSrtChange} className="hidden" id="srt-upload" disabled={isAutoGeneratingSRT || isTTSMode} />
+            <input
+              ref={srtInputRef}
+              type="file"
+              accept=".srt,text/plain"
+              onChange={handleSrtChange}
+              className="hidden"
+              aria-label="Upload SRT subtitles"
+              disabled={isAutoGeneratingSRT}
+            />
             {!isEditingSrt ? (
                 <>
                     {currentSrt ? (
@@ -242,7 +284,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                             <Button type="button" variant="outline" size="icon-sm" onClick={handleRemoveSrt} className="absolute top-3 right-3 z-20 rounded-lg" title="Remove captions">
                                 <X className="size-4" />
                             </Button>
-                            <div className="p-3 rounded-xl bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] text-white mb-3 shadow-sm">
+                            <div className="p-3 rounded-xl bg-[linear-gradient(135deg,#c084fc,#db2777)] text-white mb-3 shadow-sm">
                                 <CheckSquare className="size-6" />
                             </div>
                             <p className="font-semibold text-foreground text-sm max-w-[85%] truncate mb-0.5">{currentSrt.name}</p>
@@ -279,18 +321,16 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                         </Button>
                                     )}
                                 </div>
-                                {!isTTSMode && (
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        disabled={isAutoGeneratingSRT}
-                                        className="w-full rounded-lg gap-2 h-9"
-                                        onClick={() => document.getElementById('srt-upload')?.click()}
-                                    >
-                                        <Upload className="size-4" /> Upload .SRT
-                                    </Button>
-                                )}
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={isAutoGeneratingSRT}
+                                    className="w-full rounded-lg gap-2 h-9"
+                                    onClick={() => srtInputRef.current?.click()}
+                                >
+                                    <Upload className="size-4" /> Upload .SRT
+                                </Button>
                                 {!hasSource && activeTab === 'video' && <p className="text-[11px] text-muted-foreground text-center">Upload a video first to use Auto-Generate.</p>}
                                 {!hasSource && activeTab === 'audio' && <p className="text-[11px] text-muted-foreground text-center">Add audio first to use Auto-Generate.</p>}
                             </div>
@@ -320,7 +360,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
       <header className="shrink-0 border-b border-border bg-background/95 backdrop-blur-sm z-10">
         <div className="container flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] flex items-center justify-center">
+            <div className="size-8 rounded-lg bg-[linear-gradient(135deg,#c084fc,#db2777)] flex items-center justify-center">
               <Play className="size-4 text-white" />
             </div>
             <span className="font-semibold text-foreground">Reel Composer</span>
@@ -332,7 +372,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
           <div className="container max-w-4xl mx-auto space-y-8 py-8 px-4">
             <section className="text-center space-y-2" aria-label="Title">
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-                <span className="bg-[linear-gradient(90deg,#8B5CF6,#3B82F6)] bg-clip-text text-transparent">
+                <span className="bg-[linear-gradient(90deg,#c084fc,#db2777)] bg-clip-text text-transparent">
                   Create viral shorts
                 </span>
               </h1>
@@ -377,7 +417,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                 <Button type="button" variant="outline" size="icon-sm" onClick={handleRemoveVideo} className="absolute top-3 right-3 rounded-lg" title="Remove video">
                                     <X className="size-4" />
                                 </Button>
-                                <div className="p-4 rounded-xl bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] text-white mb-4 shadow-sm">
+                                <div className="p-4 rounded-xl bg-[linear-gradient(135deg,#c084fc,#db2777)] text-white mb-4 shadow-sm">
                                     <FileVideo className="size-8" />
                                 </div>
                                 <div className="text-center px-4">
@@ -434,7 +474,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                                             <X className="size-4" />
                                         </Button>
                                         <label htmlFor="audio-upload" className="cursor-pointer flex flex-col items-center justify-center gap-3 w-full min-h-[220px] z-10">
-                                            <div className="p-4 rounded-xl bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] text-white shadow-sm">
+                                            <div className="p-4 rounded-xl bg-[linear-gradient(135deg,#c084fc,#db2777)] text-white shadow-sm">
                                                 <Music className="size-8" />
                                             </div>
                                             <div className="text-center">
@@ -506,6 +546,61 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected, apiKey,
                 )}
               </CardContent>
             </Card>
+
+            {listDrafts && onOpenDraft && (draftList.length > 0 || draftListLoading) && (
+              <Card className="w-full overflow-hidden rounded-2xl border-border shadow-sm">
+                <CardContent className="p-6">
+                  <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2 mb-4">
+                    <History className="size-4 text-primary" aria-hidden /> Draft history
+                  </h2>
+                  {draftListLoading && draftList.length === 0 ? (
+                    <div className="flex items-center gap-3 py-4 text-muted-foreground text-sm" role="status" aria-live="polite">
+                      <div className="size-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" aria-hidden />
+                      <span>Loading drafts…</span>
+                    </div>
+                  ) : (
+                  <ul className="space-y-2 max-h-48 overflow-y-auto" aria-label="Saved drafts">
+                    {draftList.map((d) => (
+                      <li
+                        key={d.code}
+                        className="flex items-center justify-between gap-3 py-2.5 px-3 rounded-lg bg-muted/50 hover:bg-muted/80 transition-colors"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-foreground truncate">{d.topicContext}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(d.savedAt).toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="rounded-lg gap-1.5"
+                            onClick={() => onOpenDraft(d.code)}
+                          >
+                            <FolderOpen className="size-3.5" /> Open
+                          </Button>
+                          {onDeleteDraft && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon-sm"
+                              className="rounded-lg text-muted-foreground hover:text-destructive"
+                              title="Delete draft"
+                              onClick={() => onDeleteDraft(d.code).then(() => setDraftList((prev) => prev.filter((x) => x.code !== d.code)))}
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             <div className="flex flex-col items-center gap-6 pt-4">
                 <div className="flex flex-col gap-3 w-full max-w-md">

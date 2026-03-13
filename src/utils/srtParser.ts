@@ -1,17 +1,16 @@
 import { SRTItem } from '../../types';
 
 const timeToSeconds = (timeString: string): number => {
-  const [hours, minutes, seconds] = timeString.split(':');
-  // Handle both comma (standard SRT) and dot (VTT/some generators) for milliseconds
-  const separator = seconds.includes(',') ? ',' : '.';
-  const [secs, ms] = seconds.split(separator);
-
-  return (
-    parseInt(hours, 10) * 3600 +
-    parseInt(minutes, 10) * 60 +
-    parseInt(secs, 10) +
-    parseInt(ms || '0', 10) / 1000
-  );
+  const parts = timeString.trim().split(':');
+  if (parts.length < 3) return 0;
+  const [hours, minutes, secsPart] = parts;
+  const separator = secsPart?.includes(',') ? ',' : '.';
+  const [secs, ms] = (secsPart ?? '0').split(separator);
+  const h = parseInt(hours ?? '0', 10) || 0;
+  const m = parseInt(minutes ?? '0', 10) || 0;
+  const s = parseInt(secs ?? '0', 10) || 0;
+  const millis = parseInt(ms ?? '0', 10) || 0;
+  return h * 3600 + m * 60 + s + millis / 1000;
 };
 
 export const parseSRT = (data: string): SRTItem[] => {
@@ -48,7 +47,7 @@ export const parseSRT = (data: string): SRTItem[] => {
             id: isNaN(id) ? items.length + 1 : id,
             startTime: timeToSeconds(start.trim()),
             endTime: timeToSeconds(end.trim()),
-            text: textLines.join(' '),
+            text: textLines.join('\n').trim(),
           });
         }
       }

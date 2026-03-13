@@ -7,7 +7,7 @@ export const MobileBlocker: React.FC = () => {
       <div className="w-20 h-20 bg-muted rounded-2xl border border-border flex items-center justify-center mb-6 shadow-lg relative overflow-hidden">
         <Smartphone size={32} className="text-muted-foreground relative z-10" />
       </div>
-      <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-2">
+      <h2 className="text-xl font-bold bg-clip-text text-transparent bg-[linear-gradient(90deg,var(--primary),var(--accent))] mb-2">
         Desktop Experience Required
       </h2>
       <p className="text-muted-foreground max-w-xs leading-relaxed text-sm">

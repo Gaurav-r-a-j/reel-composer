@@ -14,8 +14,10 @@ export const AppContent: React.FC = () => {
 
   if (state.isRestoringDraft) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Loading draft…</p>
+      <div className="h-screen w-full flex flex-col items-center justify-center gap-6 bg-background" role="status" aria-live="polite">
+        <div className="size-10 rounded-xl border-2 border-primary/30 border-t-primary animate-spin" aria-hidden />
+        <p className="text-muted-foreground font-medium">Loading draft…</p>
+        <p className="text-xs text-muted-foreground/80">Restoring your project from storage</p>
       </div>
     );
   }
@@ -37,7 +39,7 @@ export const AppContent: React.FC = () => {
         />
       )}
 
-      <main className="flex-1 overflow-hidden relative flex flex-col">
+      <main className="flex-1 overflow-hidden relative flex flex-col" aria-label="Main content">
         {state.appState === AppState.UPLOAD && (
           <div className="flex flex-col h-full overflow-y-auto">
             <div className="flex-1">
@@ -45,6 +47,10 @@ export const AppContent: React.FC = () => {
                 onFilesSelected={state.handleFilesSelected}
                 apiKey={state.apiKey}
                 onBack={state.handleResetAuth}
+                listDrafts={state.listDrafts}
+                onOpenDraft={state.openDraftByCode}
+                onDeleteDraft={state.deleteDraft}
+                onError={state.showError}
               />
             </div>
           </div>
@@ -108,7 +114,8 @@ export const AppContent: React.FC = () => {
 
       <Snackbar
         show={state.showSnackbar}
-        message="Prompt Copied to Clipboard!"
+        message={state.snackbarMessage}
+        variant={state.snackbarVariant}
       />
 
       <ReplaceSceneDialog

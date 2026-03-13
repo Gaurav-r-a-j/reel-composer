@@ -13,8 +13,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onResetAuth, onNewProject 
     <header className="h-14 shrink-0 border-b border-border bg-background/95 backdrop-blur-sm z-10">
       <div className="container flex items-center justify-between h-full gap-4">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="size-8 shrink-0 rounded-lg bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] flex items-center justify-center">
-            <Play className="size-4 text-white" />
+          <div className="size-8 shrink-0 rounded-lg bg-[linear-gradient(135deg,var(--primary),var(--accent))] flex items-center justify-center" aria-hidden>
+            <Play className="size-4 text-white" aria-hidden />
           </div>
           <span className="font-semibold text-foreground truncate">Reel Composer</span>
         </div>

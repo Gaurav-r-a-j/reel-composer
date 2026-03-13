@@ -6,12 +6,12 @@ import {
   setCurrentDraftCode,
   clearAllDrafts,
   generateDraftCode,
+  listDrafts,
+  deleteDraft as deleteDraftStorage,
   type StoredDraft,
 } from '@/lib/draftStorage';
-import { draftUrl } from '@/routes';
 
 export interface UseDraftPersistenceArgs {
-  draftCodeFromUrl: string | undefined;
   navigate: (path: string, opts?: { replace?: boolean }) => void;
   appState: AppState;
   generatedContent: GeneratedContent | null;
@@ -28,11 +28,12 @@ export interface UseDraftPersistenceArgs {
   bgMusicFile: File | null;
   onRestore: (draft: StoredDraft) => void;
   setAppState: (s: AppState) => void;
+  /** Called when opening a draft by code fails (e.g. not found or DB error). */
+  onDraftError?: (message: string) => void;
 }
 
 export function useDraftPersistence(args: UseDraftPersistenceArgs) {
   const {
-    draftCodeFromUrl,
     navigate,
     appState,
     generatedContent,
@@ -49,39 +50,37 @@ export function useDraftPersistence(args: UseDraftPersistenceArgs) {
     bgMusicFile,
     onRestore,
     setAppState,
+    onDraftError,
   } = args;
 
   const [currentDraftCode, setCurrentDraftCodeState] = useState<string | null>(null);
   const [isRestoringDraft, setIsRestoringDraft] = useState(false);
   const autoSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Restore draft from URL when route is /draft/:code
-  useEffect(() => {
-    if (!draftCodeFromUrl) return;
-    let cancelled = false;
-    setIsRestoringDraft(true);
-    getDraftByCode(draftCodeFromUrl)
-      .then((draft: StoredDraft | null) => {
-        if (cancelled) return;
-        if (!draft) {
-          navigate('/', { replace: true });
-          return;
-        }
-        onRestore(draft);
-        setAppState(AppState.EDITOR);
-        setCurrentDraftCodeState(draftCodeFromUrl);
-        setCurrentDraftCode(draftCodeFromUrl);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setIsRestoringDraft(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [draftCodeFromUrl, navigate, onRestore, setAppState]);
+  // Open a draft by code (from history). Only time we show "Loading draft…".
+  const openDraftByCode = useCallback(
+    (code: string) => {
+      setIsRestoringDraft(true);
+      getDraftByCode(code)
+        .then((draft: StoredDraft | null) => {
+          if (!draft) {
+            onDraftError?.('Draft not found or no longer available.');
+            return;
+          }
+          onRestore(draft);
+          setAppState(AppState.EDITOR);
+          setCurrentDraftCodeState(draft.code);
+          setCurrentDraftCode(draft.code);
+        })
+        .catch(() => {
+          onDraftError?.('Failed to load draft. Try again or start a new project.');
+        })
+        .finally(() => setIsRestoringDraft(false));
+    },
+    [onRestore, setAppState, onDraftError]
+  );
 
-  const persistAndSetDraftUrl = useCallback(
+  const persistAndSetDraftCode = useCallback(
     async (code?: string) => {
       if (!generatedContent) return;
       const newCode = code ?? currentDraftCode ?? generateDraftCode();
@@ -106,7 +105,6 @@ export function useDraftPersistence(args: UseDraftPersistenceArgs) {
       );
       setCurrentDraftCodeState(newCode);
       setCurrentDraftCode(newCode);
-      navigate(draftUrl(newCode), { replace: true });
     },
     [
       generatedContent,
@@ -122,25 +120,23 @@ export function useDraftPersistence(args: UseDraftPersistenceArgs) {
       videoFile,
       bgMusicFile,
       currentDraftCode,
-      navigate,
     ]
   );
 
-  // When we enter EDITOR without a draft URL, persist and update URL
+  // When we enter EDITOR, persist to IndexedDB (stay on / so refresh restores)
   useEffect(() => {
     if (
       appState !== AppState.EDITOR ||
       !generatedContent ||
-      draftCodeFromUrl ||
       isRestoringDraft
     )
       return;
-    persistAndSetDraftUrl();
-  }, [appState, generatedContent, draftCodeFromUrl, isRestoringDraft, persistAndSetDraftUrl]);
+    persistAndSetDraftCode();
+  }, [appState, generatedContent, isRestoringDraft, persistAndSetDraftCode]);
 
   // Auto-save when in editor with a draft code (debounced)
   useEffect(() => {
-    if (appState !== AppState.EDITOR || !generatedContent || !draftCodeFromUrl) return;
+    if (appState !== AppState.EDITOR || !generatedContent || !currentDraftCode) return;
     if (autoSaveRef.current) clearTimeout(autoSaveRef.current);
     autoSaveRef.current = setTimeout(() => {
       saveDraft(
@@ -156,9 +152,9 @@ export function useDraftPersistence(args: UseDraftPersistenceArgs) {
           subtitlePaddingX,
           subtitlePaddingY,
         },
-        { code: draftCodeFromUrl, videoBlob: undefined, audioBlob: undefined }
+        { code: currentDraftCode, videoBlob: undefined, audioBlob: undefined }
       )
-        .then(() => setCurrentDraftCode(draftCodeFromUrl))
+        .then(() => setCurrentDraftCode(currentDraftCode))
         .catch(() => {});
       autoSaveRef.current = null;
     }, 3000);
@@ -177,7 +173,7 @@ export function useDraftPersistence(args: UseDraftPersistenceArgs) {
     subtitleBgColor,
     subtitlePaddingX,
     subtitlePaddingY,
-    draftCodeFromUrl,
+    currentDraftCode,
   ]);
 
   const clearDraftsAndNavigate = useCallback(() => {
@@ -195,8 +191,10 @@ export function useDraftPersistence(args: UseDraftPersistenceArgs) {
     isRestoringDraft,
     currentDraftCode,
     setCurrentDraftCodeState,
-    persistAndSetDraftUrl,
     clearDraftsAndNavigate,
     resetDraftAndNavigate,
+    openDraftByCode,
+    listDrafts,
+    deleteDraft: deleteDraftStorage,
   };
 }

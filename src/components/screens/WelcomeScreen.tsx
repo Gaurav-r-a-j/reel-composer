@@ -42,7 +42,7 @@ function WelcomeHeader() {
     <header className="relative z-10 py-4 md:py-6">
       <div className="container flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="size-9 rounded-xl bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] flex items-center justify-center shadow-md">
+          <div className="size-9 rounded-xl bg-[linear-gradient(135deg,#c084fc,#db2777)] flex items-center justify-center shadow-md">
             <PlayCircle className="size-5 text-white" />
           </div>
           <span className="font-semibold text-foreground">Reel Composer</span>
@@ -58,7 +58,7 @@ function WelcomeHero() {
     <>
       <section className="text-center pt-6 pb-4">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-          <span className="bg-[linear-gradient(90deg,#8B5CF6,#3B82F6)] bg-clip-text text-transparent">
+          <span className="bg-[linear-gradient(90deg,#c084fc,#db2777)] bg-clip-text text-transparent">
             Reel Composer
           </span>
         </h1>
@@ -97,7 +97,7 @@ function GeminiSetupCard({
         <CardContent className="p-6 md:p-8">
           <h2 className="text-xl md:text-2xl font-bold text-foreground">
             Set Up Your{' '}
-            <span className="bg-[linear-gradient(90deg,#8B5CF6,#3B82F6)] bg-clip-text text-transparent">
+            <span className="bg-[linear-gradient(90deg,#c084fc,#db2777)] bg-clip-text text-transparent">
               Gemini API Key
             </span>
           </h2>
@@ -172,29 +172,29 @@ function GeminiSetupCard({
 
 function WelcomeSteps() {
   return (
-    <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 md:mb-14">
-      <Card className="text-center rounded-2xl border-border/80 overflow-hidden">
+    <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 md:mb-14" aria-label="How it works">
+      <Card className="text-center rounded-2xl border-border/80 overflow-hidden animate-fade-in animation-delay-100">
         <CardContent className="pt-6 pb-5 px-5">
-          <div className="mx-auto mb-3 size-12 rounded-xl bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] flex items-center justify-center shadow-md">
-            <Upload className="size-6 text-white" />
+          <div className="mx-auto mb-3 size-12 rounded-xl bg-[linear-gradient(135deg,#c084fc,#e879f9)] flex items-center justify-center shadow-md">
+            <Upload className="size-6 text-white" aria-hidden />
           </div>
           <h3 className="font-bold text-foreground">1. Upload Video</h3>
           <p className="mt-1 text-sm text-muted-foreground">Add your video & subtitles</p>
         </CardContent>
       </Card>
-      <Card className="text-center rounded-2xl border-border/80 overflow-hidden">
+      <Card className="text-center rounded-2xl border-border/80 overflow-hidden animate-fade-in animation-delay-200">
         <CardContent className="pt-6 pb-5 px-5">
-          <div className="mx-auto mb-3 size-12 rounded-xl bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] flex items-center justify-center shadow-md">
-            <Sparkles className="size-6 text-white" />
+          <div className="mx-auto mb-3 size-12 rounded-xl bg-[linear-gradient(135deg,#c084fc,#db2777)] flex items-center justify-center shadow-md">
+            <Sparkles className="size-6 text-white" aria-hidden />
           </div>
           <h3 className="font-bold text-foreground">2. AI Generates Animation</h3>
           <p className="mt-1 text-sm text-muted-foreground">Gemini creates dynamic visuals</p>
         </CardContent>
       </Card>
-      <Card className="text-center rounded-2xl border-border/80 overflow-hidden">
+      <Card className="text-center rounded-2xl border-border/80 overflow-hidden animate-fade-in animation-delay-300">
         <CardContent className="pt-6 pb-5 px-5">
-          <div className="mx-auto mb-3 size-12 rounded-xl bg-[linear-gradient(135deg,#3B82F6,#60A5FA)] flex items-center justify-center shadow-md">
-            <Download className="size-6 text-white" />
+          <div className="mx-auto mb-3 size-12 rounded-xl bg-[linear-gradient(135deg,#c084fc,#db2777)] flex items-center justify-center shadow-md">
+            <Download className="size-6 text-white" aria-hidden />
           </div>
           <h3 className="font-bold text-foreground">3. Export Reel</h3>
           <p className="mt-1 text-sm text-muted-foreground">Get your shareable clip</p>
@@ -206,29 +206,29 @@ function WelcomeSteps() {
 
 function WelcomeFeatures() {
   return (
-    <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 md:mb-14">
-      <Card className="rounded-2xl border-border/80 overflow-hidden">
+    <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 md:mb-14" aria-label="Features">
+      <Card className="rounded-2xl border-border/80 overflow-hidden animate-fade-in animation-delay-100 transition-shadow hover:shadow-md">
         <CardContent className="p-5">
-          <div className="size-10 rounded-xl bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] flex items-center justify-center mb-3">
-            <Sparkles className="size-5 text-white" />
+          <div className="size-10 rounded-xl bg-[linear-gradient(135deg,#c084fc,#db2777)] flex items-center justify-center mb-3">
+            <Sparkles className="size-5 text-white" aria-hidden />
           </div>
           <h3 className="font-bold text-foreground">AI-Generated Graphics</h3>
           <p className="mt-1 text-sm text-muted-foreground">Smart visuals from your script</p>
         </CardContent>
       </Card>
-      <Card className="rounded-2xl border-border/80 overflow-hidden">
+      <Card className="rounded-2xl border-border/80 overflow-hidden animate-fade-in animation-delay-200 transition-shadow hover:shadow-md">
         <CardContent className="p-5">
           <div className="size-10 rounded-xl bg-[linear-gradient(135deg,#0D9488,#2DD4BF)] flex items-center justify-center mb-3">
-            <Code2 className="size-5 text-white" />
+            <Code2 className="size-5 text-white" aria-hidden />
           </div>
           <h3 className="font-bold text-foreground">Tech Content Focused</h3>
           <p className="mt-1 text-sm text-muted-foreground">Perfect for coding & design videos</p>
         </CardContent>
       </Card>
-      <Card className="rounded-2xl border-border/80 overflow-hidden">
+      <Card className="rounded-2xl border-border/80 overflow-hidden animate-fade-in animation-delay-300 transition-shadow hover:shadow-md">
         <CardContent className="p-5">
-          <div className="size-10 rounded-xl bg-[linear-gradient(135deg,#3B82F6,#60A5FA)] flex items-center justify-center mb-3">
-            <Zap className="size-5 text-white" />
+          <div className="size-10 rounded-xl bg-[linear-gradient(135deg,#c084fc,#db2777)] flex items-center justify-center mb-3">
+            <Zap className="size-5 text-white" aria-hidden />
           </div>
           <h3 className="font-bold text-foreground">Fast & Automated</h3>
           <p className="mt-1 text-sm text-muted-foreground">Create reels in minutes</p>

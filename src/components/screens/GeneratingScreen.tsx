@@ -51,9 +51,9 @@ export const GeneratingScreen: React.FC<GeneratingScreenProps> = ({
     <div className="flex flex-col h-full overflow-auto bg-background">
       <div className="flex-1 flex flex-col items-center justify-center w-full animate-fade-in py-8">
         <div className="container w-full flex justify-center px-4">
-          <Card className="w-full max-w-2xl overflow-hidden rounded-2xl border-border shadow-sm">
+          <Card className="w-full max-w-2xl overflow-hidden rounded-2xl border-border shadow-sm transition-shadow hover:shadow-md">
             <CardHeader className="text-center space-y-3 px-6 pt-8 pb-4">
-              <div className="mx-auto size-14 rounded-2xl bg-[linear-gradient(135deg,#8B5CF6,#3B82F6)] flex items-center justify-center text-white shadow-md">
+              <div className="mx-auto size-14 rounded-2xl bg-[linear-gradient(135deg,#c084fc,#db2777)] flex items-center justify-center text-white shadow-md">
                 <LayoutTemplate className="size-7" />
               </div>
               <CardTitle className="text-xl md:text-2xl font-bold tracking-tight">

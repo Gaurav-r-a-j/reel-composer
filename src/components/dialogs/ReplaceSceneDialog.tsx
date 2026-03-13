@@ -50,10 +50,10 @@ export const ReplaceSceneDialog: React.FC<ReplaceSceneDialogProps> = ({
         </p>
 
         <DialogFooter showCloseButton={false} className="flex-row gap-3">
-          <Button variant="outline" className="flex-1" onClick={onCancel}>
+          <Button variant="outline" className="flex-1" onClick={onCancel} aria-label="Keep current manual scene">
             Keep Manual
           </Button>
-          <Button className="flex-1" onClick={onConfirm}>
+          <Button variant="gradient" className="flex-1" onClick={onConfirm} aria-label="Replace with AI-generated scene">
             Replace Scene
           </Button>
         </DialogFooter>

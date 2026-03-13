@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { parseSRT } from '@/utils/srtParser';
 import { AppState, GeneratedContent, SRTItem } from '../../types';
 import { generateReelContent } from '@/services/geminiService';
@@ -33,6 +33,8 @@ export function useReelAppState() {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('Prompt Copied to Clipboard!');
+  const [snackbarVariant, setSnackbarVariant] = useState<'success' | 'error'>('success');
 
   const [showManualButton, setShowManualButton] = useState(false);
   const [showReplaceDialog, setShowReplaceDialog] = useState(false);
@@ -58,7 +60,6 @@ export function useReelAppState() {
   const [subtitlePaddingX, setSubtitlePaddingX] = useState(16);
   const [subtitlePaddingY, setSubtitlePaddingY] = useState(8);
 
-  const { code: draftCodeFromUrl } = useParams<{ code: string }>();
   const navigate = useNavigate();
 
   const onRestoreDraft = useCallback((draft: StoredDraft) => {
@@ -89,12 +90,21 @@ export function useReelAppState() {
     }
   }, []);
 
+  const showSnackbarWithMessage = useCallback((message: string, variant: 'success' | 'error' = 'success') => {
+    setSnackbarMessage(message);
+    setSnackbarVariant(variant);
+    setShowSnackbar(true);
+    setTimeout(() => setShowSnackbar(false), variant === 'error' ? 5000 : 4000);
+  }, []);
+
   const {
     isRestoringDraft,
     clearDraftsAndNavigate,
     resetDraftAndNavigate,
+    openDraftByCode,
+    listDrafts,
+    deleteDraft,
   } = useDraftPersistence({
-    draftCodeFromUrl,
     navigate,
     appState,
     generatedContent,
@@ -111,6 +121,7 @@ export function useReelAppState() {
     bgMusicFile,
     onRestore: onRestoreDraft,
     setAppState,
+    onDraftError: (msg) => showSnackbarWithMessage(msg, 'error'),
   });
 
   const saveApiKeyToStorage = useCallback(() => {
@@ -232,8 +243,7 @@ export function useReelAppState() {
     const prompt = constructPrompt(currentTopic, currentSrtRaw);
     try {
       await navigator.clipboard.writeText(prompt);
-      setShowSnackbar(true);
-      setTimeout(() => setShowSnackbar(false), 3000);
+      showSnackbarWithMessage('Prompt Copied to Clipboard!', 'success');
     } catch {
       /* clipboard unavailable */
     }
@@ -335,6 +345,8 @@ export function useReelAppState() {
     isFullScreen,
     isGenerating,
     showSnackbar,
+    snackbarMessage,
+    snackbarVariant,
     showManualButton,
     showReplaceDialog,
     apiKey,
@@ -372,5 +384,9 @@ export function useReelAppState() {
     setGeneratedContent,
     setTopicContext,
     setBgMusicFile,
+    openDraftByCode,
+    listDrafts,
+    deleteDraft,
+    showError: (msg) => showSnackbarWithMessage(msg, 'error'),
   };
 }
